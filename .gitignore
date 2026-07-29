@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Expo
+app/.expo/
+app/dist/
+app/web-build/
+app/*.jks
+app/*.p8
+app/*.p12
+app/*.key
+app/*.mobileprovision
+
+# Cloudflare Worker
+proxy/.wrangler/
+proxy/dist/
+
+# Secrets — never commit
+.env
+.env.local
+app/.env
+app/.env.local
+proxy/.dev.vars
+
+# OS / editor
+.DS_Store
+*.log
