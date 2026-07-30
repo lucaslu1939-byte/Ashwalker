@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -11,31 +12,56 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { sendCoachMessage, type ChatMessage } from "../src/services/coachApi";
+import {
+  appendMessage,
+  getMessages,
+} from "../src/data/repositories/conversationRepository";
 
 export default function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getMessages().then((history) => {
+      setMessages(history);
+      setLoaded(true);
+    });
+  }, []);
 
   async function handleSend() {
     const text = input.trim();
     if (!text || sending) return;
 
-    const nextMessages: ChatMessage[] = [...messages, { role: "user", content: text }];
+    const userMessage: ChatMessage = { role: "user", content: text };
+    const nextMessages: ChatMessage[] = [...messages, userMessage];
     setMessages(nextMessages);
     setInput("");
     setSending(true);
     setError(null);
+    await appendMessage("user", text);
 
     try {
       const { reply } = await sendCoachMessage(nextMessages, {});
       setMessages([...nextMessages, { role: "assistant", content: reply }]);
+      await appendMessage("assistant", reply);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setSending(false);
     }
+  }
+
+  if (!loaded) {
+    return (
+      <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+        <View style={styles.loading}>
+          <ActivityIndicator />
+        </View>
+      </SafeAreaView>
+    );
   }
 
   return (
@@ -86,6 +112,11 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
+  },
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   messageList: {
     padding: 16,

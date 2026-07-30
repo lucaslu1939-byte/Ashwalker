@@ -1,7 +1,6 @@
-export type ChatMessage = {
-  role: "user" | "assistant";
-  content: string;
-};
+import type { ChatMessage } from "../data/types";
+
+export type { ChatMessage };
 
 export type CoachResponse = {
   reply: string;
