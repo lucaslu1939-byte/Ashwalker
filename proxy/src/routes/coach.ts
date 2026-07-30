@@ -1,9 +1,6 @@
 import { createAnthropicClient, COACH_MODEL } from "../anthropic/client";
+import { buildSystemPrompt } from "../persona/promptBuilder";
 import type { CoachRequest, CoachResponse } from "../types";
-
-// Placeholder system prompt. Replaced with the real safety + persona
-// composition in a later step.
-const SYSTEM_PROMPT = "You are a warm, supportive wellness coach.";
 
 export async function handleCoach(request: Request, env: Env): Promise<Response> {
   let body: CoachRequest;
@@ -22,7 +19,7 @@ export async function handleCoach(request: Request, env: Env): Promise<Response>
   const response = await client.messages.create({
     model: COACH_MODEL,
     max_tokens: 1024,
-    system: SYSTEM_PROMPT,
+    system: buildSystemPrompt(body.profile ?? {}),
     messages: body.messages.map((m) => ({ role: m.role, content: m.content })),
   });
 
