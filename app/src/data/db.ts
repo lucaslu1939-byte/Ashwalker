@@ -17,6 +17,11 @@ export function getDb(): Promise<SQLiteDatabase> {
           content TEXT NOT NULL,
           created_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS profile_fields (
+          field_key TEXT PRIMARY KEY NOT NULL,
+          field_value TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
       `);
       return db;
     });

@@ -11,22 +11,27 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { sendCoachMessage, type ChatMessage } from "../src/services/coachApi";
 import {
   appendMessage,
   getMessages,
 } from "../src/data/repositories/conversationRepository";
+import { getProfile, updateFields } from "../src/data/repositories/profileRepository";
 
 export default function Chat() {
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [profile, setProfile] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getMessages().then((history) => {
+    Promise.all([getMessages(), getProfile()]).then(([history, savedProfile]) => {
       setMessages(history);
+      setProfile(savedProfile);
       setLoaded(true);
     });
   }, []);
@@ -44,9 +49,14 @@ export default function Chat() {
     await appendMessage("user", text);
 
     try {
-      const { reply } = await sendCoachMessage(nextMessages, {});
+      const { reply, profileUpdates } = await sendCoachMessage(nextMessages, profile);
       setMessages([...nextMessages, { role: "assistant", content: reply }]);
       await appendMessage("assistant", reply);
+
+      if (Object.keys(profileUpdates).length > 0) {
+        setProfile((prev) => ({ ...prev, ...profileUpdates }));
+        await updateFields(profileUpdates);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -87,6 +97,11 @@ export default function Chat() {
           )}
         />
         {error && <Text style={styles.error}>{error}</Text>}
+        {__DEV__ && (
+          <TouchableOpacity style={styles.devLink} onPress={() => router.push("/dev-profile")}>
+            <Text style={styles.devLinkText}>dev: view profile</Text>
+          </TouchableOpacity>
+        )}
         <View style={styles.inputRow}>
           <TextInput
             style={styles.input}
@@ -140,6 +155,14 @@ const styles = StyleSheet.create({
   bubbleText: {
     fontSize: 15,
     lineHeight: 20,
+  },
+  devLink: {
+    alignItems: "center",
+    paddingBottom: 4,
+  },
+  devLinkText: {
+    fontSize: 11,
+    color: "#AAA",
   },
   error: {
     color: "#B00020",
