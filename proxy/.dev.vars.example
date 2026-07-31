@@ -1,1 +1,5 @@
 ANTHROPIC_API_KEY=sk-ant-api03-...
+# Any random string — must match EXPO_PUBLIC_APP_SECRET in app/.env.
+# Not real security (it ships inside the app bundle), just a speed bump
+# against random internet traffic hitting your Anthropic bill.
+APP_SHARED_SECRET=generate-any-random-string-here

@@ -36,21 +36,13 @@ export default function Chat() {
     });
   }, []);
 
-  async function handleSend() {
-    const text = input.trim();
-    if (!text || sending) return;
-
-    const userMessage: ChatMessage = { role: "user", content: text };
-    const nextMessages: ChatMessage[] = [...messages, userMessage];
-    setMessages(nextMessages);
-    setInput("");
+  async function requestCoachReply(conversation: ChatMessage[]) {
     setSending(true);
     setError(null);
-    await appendMessage("user", text);
 
     try {
-      const { reply, profileUpdates } = await sendCoachMessage(nextMessages, profile);
-      setMessages([...nextMessages, { role: "assistant", content: reply }]);
+      const { reply, profileUpdates } = await sendCoachMessage(conversation, profile);
+      setMessages([...conversation, { role: "assistant", content: reply }]);
       await appendMessage("assistant", reply);
 
       if (Object.keys(profileUpdates).length > 0) {
@@ -62,6 +54,22 @@ export default function Chat() {
     } finally {
       setSending(false);
     }
+  }
+
+  async function handleSend() {
+    const text = input.trim();
+    if (!text || sending) return;
+
+    const nextMessages: ChatMessage[] = [...messages, { role: "user", content: text }];
+    setMessages(nextMessages);
+    setInput("");
+    await appendMessage("user", text);
+    await requestCoachReply(nextMessages);
+  }
+
+  function handleRetry() {
+    if (sending || messages.length === 0) return;
+    requestCoachReply(messages);
   }
 
   if (!loaded) {
@@ -96,7 +104,14 @@ export default function Chat() {
             </View>
           )}
         />
-        {error && <Text style={styles.error}>{error}</Text>}
+        {error && (
+          <View style={styles.errorRow}>
+            <Text style={styles.error}>{error}</Text>
+            <TouchableOpacity onPress={handleRetry} disabled={sending}>
+              <Text style={styles.retryText}>Try again</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         {__DEV__ && (
           <TouchableOpacity style={styles.devLink} onPress={() => router.push("/dev-profile")}>
             <Text style={styles.devLinkText}>dev: view profile</Text>
@@ -112,7 +127,11 @@ export default function Chat() {
             multiline
           />
           <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={sending}>
-            <Text style={styles.sendButtonText}>{sending ? "..." : "Send"}</Text>
+            {sending ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.sendButtonText}>Send</Text>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -164,10 +183,21 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#AAA",
   },
-  error: {
-    color: "#B00020",
+  errorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingBottom: 8,
+    gap: 12,
+  },
+  error: {
+    flex: 1,
+    color: "#B00020",
+  },
+  retryText: {
+    color: "#3E7C59",
+    fontWeight: "600",
   },
   inputRow: {
     flexDirection: "row",

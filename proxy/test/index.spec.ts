@@ -27,4 +27,22 @@ describe("proxy worker", () => {
 		const response = await SELF.fetch("https://example.com/unknown");
 		expect(response.status).toBe(404);
 	});
+
+	it("rejects /coach requests missing the app secret header", async () => {
+		const response = await SELF.fetch("https://example.com/coach", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ messages: [], profile: {} }),
+		});
+		expect(response.status).toBe(401);
+	});
+
+	it("rejects /coach requests with the wrong app secret header", async () => {
+		const response = await SELF.fetch("https://example.com/coach", {
+			method: "POST",
+			headers: { "Content-Type": "application/json", "X-App-Secret": "wrong" },
+			body: JSON.stringify({ messages: [], profile: {} }),
+		});
+		expect(response.status).toBe(401);
+	});
 });

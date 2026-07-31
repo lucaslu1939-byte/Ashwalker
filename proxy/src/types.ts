@@ -3,6 +3,7 @@ export {};
 declare global {
   interface Env {
     ANTHROPIC_API_KEY: string;
+    APP_SHARED_SECRET: string;
   }
 }
 
