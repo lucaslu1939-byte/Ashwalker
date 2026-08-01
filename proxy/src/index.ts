@@ -1,4 +1,5 @@
 import { handleCoach } from "./routes/coach";
+import { handleDietPlan } from "./routes/dietPlan";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -14,6 +15,13 @@ function withCors(response: Response): Response {
   return new Response(response.body, { status: response.status, headers });
 }
 
+// Not a real security boundary — the secret ships inside the mobile app
+// bundle and can be extracted. It only deters random internet traffic from
+// running up the Anthropic bill.
+function isAuthorized(request: Request, env: Env): boolean {
+  return request.headers.get("X-App-Secret") === env.APP_SHARED_SECRET;
+}
+
 export default {
   async fetch(request, env, ctx): Promise<Response> {
     if (request.method === "OPTIONS") {
@@ -27,13 +35,17 @@ export default {
     }
 
     if (url.pathname === "/coach" && request.method === "POST") {
-      // Not a real security boundary — the secret ships inside the mobile app
-      // bundle and can be extracted. It only deters random internet traffic
-      // from running up the Anthropic bill.
-      if (request.headers.get("X-App-Secret") !== env.APP_SHARED_SECRET) {
+      if (!isAuthorized(request, env)) {
         return withCors(Response.json({ error: "Unauthorized" }, { status: 401 }));
       }
       return withCors(await handleCoach(request, env));
+    }
+
+    if (url.pathname === "/diet-plan" && request.method === "POST") {
+      if (!isAuthorized(request, env)) {
+        return withCors(Response.json({ error: "Unauthorized" }, { status: 401 }));
+      }
+      return withCors(await handleDietPlan(request, env));
     }
 
     return withCors(new Response("Not found", { status: 404 }));

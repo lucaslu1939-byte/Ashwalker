@@ -84,6 +84,12 @@ export default function Chat() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Ashwalker</Text>
+        <TouchableOpacity onPress={() => router.push("/plan")}>
+          <Text style={styles.headerLink}>My Plan</Text>
+        </TouchableOpacity>
+      </View>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -143,6 +149,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#DDD",
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+  },
+  headerLink: {
+    color: "#3E7C59",
+    fontWeight: "600",
   },
   flex: {
     flex: 1,

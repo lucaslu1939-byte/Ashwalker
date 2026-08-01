@@ -22,6 +22,11 @@ export function getDb(): Promise<SQLiteDatabase> {
           field_value TEXT NOT NULL,
           updated_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS diet_plans (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          content TEXT NOT NULL,
+          created_at TEXT NOT NULL
+        );
       `);
       return db;
     });

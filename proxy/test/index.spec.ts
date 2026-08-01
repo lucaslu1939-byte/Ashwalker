@@ -45,4 +45,31 @@ describe("proxy worker", () => {
 		});
 		expect(response.status).toBe(401);
 	});
+
+	it("rejects /diet-plan requests missing the app secret header", async () => {
+		const response = await SELF.fetch("https://example.com/diet-plan", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ profile: {} }),
+		});
+		expect(response.status).toBe(401);
+	});
+
+	it("rejects /diet-plan requests with the wrong app secret header", async () => {
+		const response = await SELF.fetch("https://example.com/diet-plan", {
+			method: "POST",
+			headers: { "Content-Type": "application/json", "X-App-Secret": "wrong" },
+			body: JSON.stringify({ profile: {} }),
+		});
+		expect(response.status).toBe(401);
+	});
+
+	it("returns 400 (not a crash) for /coach when the JSON body is a literal null", async () => {
+		const response = await SELF.fetch("https://example.com/coach", {
+			method: "POST",
+			headers: { "Content-Type": "application/json", "X-App-Secret": env.APP_SHARED_SECRET },
+			body: "null",
+		});
+		expect(response.status).toBe(400);
+	});
 });

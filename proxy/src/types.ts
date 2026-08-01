@@ -14,10 +14,18 @@ export type ChatMessage = {
 
 export type CoachRequest = {
   messages: ChatMessage[];
-  profile: Record<string, string | null>;
+  profile?: Record<string, string | null>;
 };
 
 export type CoachResponse = {
   reply: string;
   profileUpdates: Record<string, string>;
+};
+
+export type DietPlanRequest = {
+  profile?: Record<string, string | null>;
+};
+
+export type DietPlanResponse = {
+  plan: string;
 };
