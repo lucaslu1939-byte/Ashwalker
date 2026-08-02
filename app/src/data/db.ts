@@ -35,6 +35,12 @@ export function getDb(): Promise<SQLiteDatabase> {
           grocery_list_json TEXT,
           created_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS recipe_details (
+          meal_text TEXT PRIMARY KEY NOT NULL,
+          ingredients_json TEXT NOT NULL,
+          instructions_json TEXT NOT NULL,
+          created_at TEXT NOT NULL
+        );
       `);
       return db;
     });

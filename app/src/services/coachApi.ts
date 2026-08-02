@@ -1,4 +1,4 @@
-import type { ChatMessage, DayPlan, GroceryCategory, MealType } from "../data/types";
+import type { ChatMessage, DayPlan, GroceryCategory, MealType, RecipeDetail } from "../data/types";
 
 export type { ChatMessage };
 
@@ -85,4 +85,11 @@ export async function swapRecipe(
 
 export async function generateGroceryList(days: DayPlan[]): Promise<GroceryListResponse> {
   return postToProxy<GroceryListResponse>("/grocery-list", { days }, "Grocery list");
+}
+
+export async function fetchRecipeDetail(
+  profile: Record<string, string | null>,
+  mealText: string
+): Promise<RecipeDetail> {
+  return postToProxy<RecipeDetail>("/recipe-detail", { profile, mealText }, "Recipe");
 }

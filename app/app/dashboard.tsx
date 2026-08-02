@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GradientCard, cardText } from "../src/components/GradientCard";
+import { MealCard } from "../src/components/MealCard";
+import { RecipeModal } from "../src/components/RecipeModal";
 import { colors } from "../src/theme/colors";
 import type { DayPlan, MealType, WeeklyPlan } from "../src/data/types";
 import {
@@ -36,10 +38,12 @@ export default function Dashboard() {
   const router = useRouter();
   const [loaded, setLoaded] = useState(false);
   const [weekPlan, setWeekPlan] = useState<WeeklyPlan | null>(null);
+  const [profile, setProfile] = useState<Record<string, string>>({});
   const [selectedDay, setSelectedDay] = useState(1);
   const [generating, setGenerating] = useState(false);
   const [swappingSlot, setSwappingSlot] = useState<string | null>(null);
   const [groceryBusy, setGroceryBusy] = useState(false);
+  const [selectedMealText, setSelectedMealText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   // A single shared lock: only one of generate-week / swap-recipe /
   // build-grocery-list may be in flight at a time. Without this, a swap and
@@ -51,7 +55,8 @@ export default function Dashboard() {
   useEffect(() => {
     (async () => {
       try {
-        const existing = await getCurrentWeekPlan();
+        const [existing, savedProfile] = await Promise.all([getCurrentWeekPlan(), getProfile()]);
+        setProfile(savedProfile);
         if (existing) {
           // Show what we have immediately — if a refresh below fails, this
           // stays on screen instead of the user losing their week entirely.
@@ -201,38 +206,38 @@ export default function Dashboard() {
           </View>
 
           <ScrollView contentContainerStyle={styles.content}>
-            <View style={styles.mealsBlock}>
-              {(["breakfast", "lunch", "dinner"] as MealType[]).map((mealType) => {
-                const slotKey = `${day.dayNumber}-${mealType}`;
-                const isSwapping = swappingSlot === slotKey;
-                return (
-                  <View key={mealType} style={styles.mealRow}>
-                    <View style={styles.mealRowHeader}>
-                      <Text style={styles.mealLabel}>{MEAL_LABELS[mealType]}</Text>
-                      <TouchableOpacity
-                        onPress={() => handleSwap(day, mealType)}
-                        disabled={busy}
-                      >
-                        {isSwapping ? (
-                          <ActivityIndicator size="small" color={colors.inkDim} />
-                        ) : (
-                          <Text
-                            style={[styles.shuffleText, busy && styles.shuffleTextDisabled]}
-                          >
-                            Shuffle
-                          </Text>
-                        )}
-                      </TouchableOpacity>
-                    </View>
-                    <Text style={styles.mealText}>{day[mealType]}</Text>
-                  </View>
-                );
-              })}
-              <View style={styles.mealRow}>
-                <Text style={styles.mealLabel}>Snack</Text>
-                <Text style={styles.mealText}>{day.snack}</Text>
-              </View>
-            </View>
+            <MealCard
+              label="Celery Juice"
+              text={day.celeryJuice}
+              onPress={() => setSelectedMealText(day.celeryJuice)}
+              disabled={busy}
+            />
+            <MealCard
+              label="Heavy Metal Detox Smoothie"
+              text={day.heavyMetalDetoxSmoothie}
+              onPress={() => setSelectedMealText(day.heavyMetalDetoxSmoothie)}
+              disabled={busy}
+            />
+            {(["breakfast", "lunch", "dinner"] as MealType[]).map((mealType) => {
+              const slotKey = `${day.dayNumber}-${mealType}`;
+              return (
+                <MealCard
+                  key={mealType}
+                  label={MEAL_LABELS[mealType]}
+                  text={day[mealType]}
+                  onPress={() => setSelectedMealText(day[mealType])}
+                  onShuffle={() => handleSwap(day, mealType)}
+                  shuffling={swappingSlot === slotKey}
+                  disabled={busy}
+                />
+              );
+            })}
+            <MealCard
+              label="Snack"
+              text={day.snack}
+              onPress={() => setSelectedMealText(day.snack)}
+              disabled={busy}
+            />
 
             <View style={styles.grid}>
               <GradientCard flavor="sage">
@@ -281,6 +286,12 @@ export default function Dashboard() {
           </TouchableOpacity>
         </View>
       )}
+
+      <RecipeModal
+        mealText={selectedMealText}
+        profile={profile}
+        onClose={() => setSelectedMealText(null)}
+      />
     </SafeAreaView>
   );
 }
@@ -369,43 +380,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 32,
     gap: 14,
-  },
-  mealsBlock: {
-    backgroundColor: colors.bgElev,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-    padding: 16,
-    gap: 14,
-  },
-  mealRow: {
-    gap: 4,
-  },
-  mealRowHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  mealLabel: {
-    fontFamily: "Inter_700Bold",
-    fontSize: 10.5,
-    letterSpacing: 1.4,
-    textTransform: "uppercase",
-    color: colors.inkFaint,
-  },
-  shuffleTextDisabled: {
-    color: colors.inkFaint,
-  },
-  shuffleText: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 12,
-    color: colors.accentLink,
-  },
-  mealText: {
-    fontFamily: "Inter_500Medium",
-    fontSize: 14.5,
-    lineHeight: 20,
-    color: colors.ink,
   },
   grid: {
     flexDirection: "row",

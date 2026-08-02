@@ -5,6 +5,8 @@ export type ChatMessage = {
 
 export type DayPlan = {
   dayNumber: number;
+  celeryJuice: string;
+  heavyMetalDetoxSmoothie: string;
   breakfast: string;
   lunch: string;
   dinner: string;
@@ -12,6 +14,11 @@ export type DayPlan = {
   movement: string;
   meditation: string;
   frequencyHealing: string;
+};
+
+export type RecipeDetail = {
+  ingredients: string[];
+  instructions: string[];
 };
 
 export type MealType = "breakfast" | "lunch" | "dinner";
