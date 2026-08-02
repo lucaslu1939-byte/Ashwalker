@@ -15,6 +15,7 @@ const AUTHENTICATED_ROUTES: { path: string; body: unknown }[] = [
 	{ path: "/weekly-plan", body: { profile: {} } },
 	{ path: "/swap-recipe", body: { mealType: "breakfast", avoidRecipes: [] } },
 	{ path: "/grocery-list", body: { days: [] } },
+	{ path: "/recipe-detail", body: { mealText: "Warm oatmeal with banana" } },
 ];
 
 describe("proxy worker", () => {
@@ -94,6 +95,24 @@ describe("proxy worker", () => {
 			method: "POST",
 			headers: { "Content-Type": "application/json", "X-App-Secret": env.APP_SHARED_SECRET },
 			body: JSON.stringify({ days: tooManyDays }),
+		});
+		expect(response.status).toBe(400);
+	});
+
+	it("rejects /recipe-detail with an empty mealText (authenticated)", async () => {
+		const response = await SELF.fetch("https://example.com/recipe-detail", {
+			method: "POST",
+			headers: { "Content-Type": "application/json", "X-App-Secret": env.APP_SHARED_SECRET },
+			body: JSON.stringify({ mealText: "" }),
+		});
+		expect(response.status).toBe(400);
+	});
+
+	it("rejects /recipe-detail with an overly long mealText (authenticated)", async () => {
+		const response = await SELF.fetch("https://example.com/recipe-detail", {
+			method: "POST",
+			headers: { "Content-Type": "application/json", "X-App-Secret": env.APP_SHARED_SECRET },
+			body: JSON.stringify({ mealText: "x".repeat(501) }),
 		});
 		expect(response.status).toBe(400);
 	});

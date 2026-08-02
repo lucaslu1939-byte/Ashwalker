@@ -25,6 +25,14 @@ function isValidDay(value: unknown): value is DayPlan {
   );
 }
 
+// celeryJuice and heavyMetalDetoxSmoothie are the same recipe every day, so
+// only include them once (from whichever day has them) rather than 7x
+// repeated identical text bloating the prompt.
+function findDailyStaple(days: DayPlan[], field: "celeryJuice" | "heavyMetalDetoxSmoothie"): string | null {
+  const day = days.find((d) => isReasonableMealText(d[field]));
+  return day ? day[field] : null;
+}
+
 function isValidGroceryResponse(value: unknown): value is GroceryListResponse {
   if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<GroceryListResponse>;
@@ -42,12 +50,21 @@ function isValidGroceryResponse(value: unknown): value is GroceryListResponse {
 }
 
 function renderWeekRecipes(days: DayPlan[]): string {
-  return days
+  const dailyLines = days
     .map(
       (day, i) =>
         `Day ${day.dayNumber ?? i + 1}: Breakfast - ${day.breakfast}; Lunch - ${day.lunch}; Dinner - ${day.dinner}`
     )
     .join("\n");
+
+  const staples = [
+    findDailyStaple(days, "celeryJuice") ? `Daily: ${findDailyStaple(days, "celeryJuice")}` : null,
+    findDailyStaple(days, "heavyMetalDetoxSmoothie")
+      ? `Daily: ${findDailyStaple(days, "heavyMetalDetoxSmoothie")}`
+      : null,
+  ].filter((line): line is string => line !== null);
+
+  return [...staples, dailyLines].join("\n");
 }
 
 export async function handleGroceryList(request: Request, env: Env): Promise<Response> {

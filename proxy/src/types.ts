@@ -32,6 +32,8 @@ export type DietPlanResponse = {
 
 export type DayPlan = {
   dayNumber: number;
+  celeryJuice: string;
+  heavyMetalDetoxSmoothie: string;
   breakfast: string;
   lunch: string;
   dinner: string;
@@ -73,4 +75,14 @@ export type GroceryListRequest = {
 
 export type GroceryListResponse = {
   categories: GroceryCategory[];
+};
+
+export type RecipeDetailRequest = {
+  profile?: Record<string, string | null>;
+  mealText?: string;
+};
+
+export type RecipeDetailResponse = {
+  ingredients: string[];
+  instructions: string[];
 };

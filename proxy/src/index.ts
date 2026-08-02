@@ -3,6 +3,7 @@ import { handleDietPlan } from "./routes/dietPlan";
 import { handleWeeklyPlan } from "./routes/weeklyPlan";
 import { handleSwapRecipe } from "./routes/swapRecipe";
 import { handleGroceryList } from "./routes/groceryList";
+import { handleRecipeDetail } from "./routes/recipeDetail";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -33,6 +34,7 @@ const AUTHENTICATED_ROUTES: Record<string, RouteHandler> = {
   "/weekly-plan": handleWeeklyPlan,
   "/swap-recipe": handleSwapRecipe,
   "/grocery-list": handleGroceryList,
+  "/recipe-detail": handleRecipeDetail,
 };
 
 export default {

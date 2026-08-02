@@ -5,6 +5,8 @@ import { buildWeeklyPlanSystemPrompt } from "../persona/promptBuilder";
 import type { DayPlan, WeeklyPlanRequest, WeeklyPlanResponse } from "../types";
 
 const REQUIRED_DAY_FIELDS: (keyof DayPlan)[] = [
+  "celeryJuice",
+  "heavyMetalDetoxSmoothie",
   "breakfast",
   "lunch",
   "dinner",
@@ -70,7 +72,7 @@ export async function handleWeeklyPlan(request: Request, env: Env): Promise<Resp
   try {
     const response = await client.messages.create({
       model: COACH_MODEL,
-      max_tokens: 4096,
+      max_tokens: 6144,
       system: buildWeeklyPlanSystemPrompt(profile),
       messages: [
         {
