@@ -6,6 +6,10 @@ import type { DayPlan, GroceryCategory, GroceryListRequest, GroceryListResponse 
 
 const MAX_DAYS = 7;
 const MAX_FIELD_LENGTH = 500;
+// morningRoutine describes a multi-step sequence (lemon water, celery juice,
+// and often the full Heavy Metal Detox Smoothie ingredient list), so it
+// legitimately runs longer than a single meal's text.
+const MAX_ROUTINE_LENGTH = 900;
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -13,6 +17,10 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isReasonableMealText(value: unknown): value is string {
   return isNonEmptyString(value) && value.length <= MAX_FIELD_LENGTH;
+}
+
+function isReasonableRoutineText(value: unknown): value is string {
+  return isNonEmptyString(value) && value.length <= MAX_ROUTINE_LENGTH;
 }
 
 function isValidDay(value: unknown): value is DayPlan {
@@ -25,12 +33,12 @@ function isValidDay(value: unknown): value is DayPlan {
   );
 }
 
-// celeryJuice and heavyMetalDetoxSmoothie are the same recipe every day, so
-// only include them once (from whichever day has them) rather than 7x
-// repeated identical text bloating the prompt.
-function findDailyStaple(days: DayPlan[], field: "celeryJuice" | "heavyMetalDetoxSmoothie"): string | null {
-  const day = days.find((d) => isReasonableMealText(d[field]));
-  return day ? day[field] : null;
+// morningRoutine is the same daily practice every day, so only include it
+// once (from whichever day has it) rather than 7x repeated identical text
+// bloating the prompt.
+function findMorningRoutine(days: DayPlan[]): string | null {
+  const day = days.find((d) => isReasonableRoutineText(d.morningRoutine));
+  return day ? day.morningRoutine : null;
 }
 
 function isValidGroceryResponse(value: unknown): value is GroceryListResponse {
@@ -57,12 +65,8 @@ function renderWeekRecipes(days: DayPlan[]): string {
     )
     .join("\n");
 
-  const staples = [
-    findDailyStaple(days, "celeryJuice") ? `Daily: ${findDailyStaple(days, "celeryJuice")}` : null,
-    findDailyStaple(days, "heavyMetalDetoxSmoothie")
-      ? `Daily: ${findDailyStaple(days, "heavyMetalDetoxSmoothie")}`
-      : null,
-  ].filter((line): line is string => line !== null);
+  const morningRoutine = findMorningRoutine(days);
+  const staples = morningRoutine ? [`Daily: ${morningRoutine}`] : [];
 
   return [...staples, dailyLines].join("\n");
 }

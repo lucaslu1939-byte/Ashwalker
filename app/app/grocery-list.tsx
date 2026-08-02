@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   headerLink: {
     fontFamily: "Inter_600SemiBold",
-    color: colors.accentLink,
+    color: colors.accentOrange,
   },
   headerSpacer: {
     width: 40,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: colors.accentLink,
+    backgroundColor: colors.accentOrange,
   },
   itemText: {
     fontFamily: "Inter_500Medium",

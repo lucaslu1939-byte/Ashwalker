@@ -5,8 +5,7 @@ import { buildWeeklyPlanSystemPrompt } from "../persona/promptBuilder";
 import type { DayPlan, WeeklyPlanRequest, WeeklyPlanResponse } from "../types";
 
 const REQUIRED_DAY_FIELDS: (keyof DayPlan)[] = [
-  "celeryJuice",
-  "heavyMetalDetoxSmoothie",
+  "morningRoutine",
   "breakfast",
   "lunch",
   "dinner",

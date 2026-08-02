@@ -15,6 +15,9 @@ export const colors = {
   sheen: "rgba(255,255,255,0.14)",
 
   accentLink: "#5b9fe0",
+  // Warm accent used specifically on the food dashboard (plan, meal cards,
+  // recipe modal, grocery list) — the rest of the app keeps accentLink.
+  accentOrange: "#f5893a",
 } as const;
 
 // Each card "flavor" is a two-stop diagonal gradient, matching the reference's
@@ -25,6 +28,7 @@ export const gradients = {
   magenta: ["#e155a0", "#a6337f"],
   navy: ["#1c2550", "#090b1e"],
   amber: ["#eda23f", "#c1621f"],
+  rust: ["#c1622a", "#7a3410"],
 } as const;
 
 export const accentBlue = "#5b9fe0";

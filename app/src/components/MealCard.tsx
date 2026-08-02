@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   shuffleText: {
     fontFamily: "Inter_600SemiBold",
     fontSize: 12,
-    color: colors.accentLink,
+    color: colors.accentOrange,
   },
   shuffleTextDisabled: {
     color: colors.inkFaint,

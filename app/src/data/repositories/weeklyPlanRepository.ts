@@ -10,11 +10,22 @@ type WeeklyPlanRow = {
   grocery_list_json: string | null;
 };
 
-function rowToWeeklyPlan(row: WeeklyPlanRow): WeeklyPlan {
+// A plan saved before the celeryJuice/heavyMetalDetoxSmoothie fields were
+// merged into morningRoutine won't have that field — treat it the same as
+// no plan at all so the dashboard prompts a fresh regeneration instead of
+// rendering an undefined field.
+function isCurrentSchemaDay(day: unknown): day is DayPlan {
+  return !!day && typeof day === "object" && typeof (day as DayPlan).morningRoutine === "string";
+}
+
+function rowToWeeklyPlan(row: WeeklyPlanRow): WeeklyPlan | null {
+  const days = JSON.parse(row.days_json) as unknown[];
+  if (!days.every(isCurrentSchemaDay)) return null;
+
   return {
     weekStartDate: row.week_start_date,
     introNote: row.intro_note,
-    days: JSON.parse(row.days_json) as DayPlan[],
+    days,
     groceryList: row.grocery_list_json ? (JSON.parse(row.grocery_list_json) as GroceryCategory[]) : null,
   };
 }

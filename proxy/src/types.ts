@@ -32,8 +32,7 @@ export type DietPlanResponse = {
 
 export type DayPlan = {
   dayNumber: number;
-  celeryJuice: string;
-  heavyMetalDetoxSmoothie: string;
+  morningRoutine: string;
   breakfast: string;
   lunch: string;
   dinner: string;

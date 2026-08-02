@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   closeLink: {
     fontFamily: "Inter_600SemiBold",
-    color: colors.accentLink,
+    color: colors.accentOrange,
   },
   headerSpacer: {
     width: 40,
@@ -186,12 +186,12 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: colors.accentLink,
+    backgroundColor: colors.accentOrange,
     marginTop: 8,
   },
   stepNumber: {
     fontFamily: "Inter_700Bold",
-    color: colors.accentLink,
+    color: colors.accentOrange,
     fontSize: 14.5,
     minWidth: 20,
   },

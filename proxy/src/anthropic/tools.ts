@@ -36,21 +36,17 @@ export const UPDATE_PROFILE_TOOL: Anthropic.Tool = {
 
 const DAY_PLAN_PROPERTIES = {
   dayNumber: { type: "integer", minimum: 1, maximum: 7 },
-  celeryJuice: {
+  morningRoutine: {
     type: "string",
     description:
-      "A short daily reminder for plain 16oz celery juice on an empty stomach, first thing in " +
-      "the morning, waiting 15-30 minutes before eating anything else. Wording may vary slightly " +
-      "day to day but the practice itself is consistent — this is not a swappable meal.",
-  },
-  heavyMetalDetoxSmoothie: {
-    type: "string",
-    description:
-      "A short daily reminder for the Heavy Metal Detox Smoothie: 2 bananas, 2 cups wild " +
-      "blueberries (or standard blueberries if unavailable), 1 cup cilantro, 1 tablespoon barley " +
-      "grass juice powder, 1 teaspoon spirulina, 1 tablespoon Atlantic dulse, blended with orange " +
-      "juice or water. State the real ingredients plainly. This is a consistent daily practice, " +
-      "not a swappable meal.",
+      "A short description of the pre-breakfast morning sequence, as one cohesive routine: " +
+      "warm lemon water on waking, then 16oz plain celery juice on an empty stomach 15-30 " +
+      "minutes later, waiting another 15-30 minutes before breakfast. Mention that the Heavy " +
+      "Metal Detox Smoothie (2 bananas, 2 cups wild blueberries, 1 cup cilantro, 1 tablespoon " +
+      "barley grass juice powder, 1 teaspoon spirulina, 1 tablespoon Atlantic dulse, blended " +
+      "with orange juice or water) is a good option for breakfast itself, especially a few days " +
+      "a week. This whole sequence is a consistent daily practice, not a swappable meal — wording " +
+      "may vary slightly day to day but the routine itself stays the same.",
   },
   breakfast: { type: "string" },
   lunch: { type: "string" },
@@ -66,10 +62,11 @@ export const GENERATE_WEEKLY_PLAN_TOOL: Anthropic.Tool = {
   description:
     "Return the complete 7-day wellness plan as structured data. Every day must have all fields " +
     "filled in, and no breakfast/lunch/dinner recipe may repeat across the 7 days (snacks may " +
-    "repeat). celeryJuice and heavyMetalDetoxSmoothie are fixed daily staples — include real " +
-    "ingredients, and their presence should not vary by day. Detail level for breakfast/lunch/" +
-    "dinner (how specific each recipe is) should still adapt to the user's diet experience, but " +
-    "every day needs a value in every field regardless of experience level.",
+    "repeat). morningRoutine is a fixed daily practice covering lemon water, celery juice, and " +
+    "the Heavy Metal Detox Smoothie as a sequence — include real ingredients, and its presence " +
+    "should not vary by day. Detail level for breakfast/lunch/dinner (how specific each recipe " +
+    "is) should still adapt to the user's diet experience, but every day needs a value in every " +
+    "field regardless of experience level.",
   input_schema: {
     type: "object",
     properties: {
@@ -86,8 +83,7 @@ export const GENERATE_WEEKLY_PLAN_TOOL: Anthropic.Tool = {
           properties: DAY_PLAN_PROPERTIES,
           required: [
             "dayNumber",
-            "celeryJuice",
-            "heavyMetalDetoxSmoothie",
+            "morningRoutine",
             "breakfast",
             "lunch",
             "dinner",

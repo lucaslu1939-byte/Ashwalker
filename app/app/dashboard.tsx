@@ -207,15 +207,9 @@ export default function Dashboard() {
 
           <ScrollView contentContainerStyle={styles.content}>
             <MealCard
-              label="Celery Juice"
-              text={day.celeryJuice}
-              onPress={() => setSelectedMealText(day.celeryJuice)}
-              disabled={busy}
-            />
-            <MealCard
-              label="Heavy Metal Detox Smoothie"
-              text={day.heavyMetalDetoxSmoothie}
-              onPress={() => setSelectedMealText(day.heavyMetalDetoxSmoothie)}
+              label="Morning Routine"
+              text={day.morningRoutine}
+              onPress={() => setSelectedMealText(day.morningRoutine)}
               disabled={busy}
             />
             {(["breakfast", "lunch", "dinner"] as MealType[]).map((mealType) => {
@@ -240,15 +234,15 @@ export default function Dashboard() {
             />
 
             <View style={styles.grid}>
-              <GradientCard flavor="sage">
+              <GradientCard flavor="amber">
                 <Text style={cardText.label}>Movement</Text>
                 <Text style={cardText.body}>{day.movement}</Text>
               </GradientCard>
-              <GradientCard flavor="magenta">
+              <GradientCard flavor="mauve">
                 <Text style={cardText.label}>Meditation</Text>
                 <Text style={cardText.body}>{day.meditation}</Text>
               </GradientCard>
-              <GradientCard flavor="navy" span={2}>
+              <GradientCard flavor="rust" span={2}>
                 <Text style={cardText.label}>Frequency Healing</Text>
                 <Text style={cardText.body}>{day.frequencyHealing}</Text>
               </GradientCard>
