@@ -27,6 +27,14 @@ export function getDb(): Promise<SQLiteDatabase> {
           content TEXT NOT NULL,
           created_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS weekly_plans (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          week_start_date TEXT NOT NULL,
+          intro_note TEXT NOT NULL,
+          days_json TEXT NOT NULL,
+          grocery_list_json TEXT,
+          created_at TEXT NOT NULL
+        );
       `);
       return db;
     });

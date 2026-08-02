@@ -1,5 +1,8 @@
 import { handleCoach } from "./routes/coach";
 import { handleDietPlan } from "./routes/dietPlan";
+import { handleWeeklyPlan } from "./routes/weeklyPlan";
+import { handleSwapRecipe } from "./routes/swapRecipe";
+import { handleGroceryList } from "./routes/groceryList";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -22,6 +25,16 @@ function isAuthorized(request: Request, env: Env): boolean {
   return request.headers.get("X-App-Secret") === env.APP_SHARED_SECRET;
 }
 
+type RouteHandler = (request: Request, env: Env) => Promise<Response>;
+
+const AUTHENTICATED_ROUTES: Record<string, RouteHandler> = {
+  "/coach": handleCoach,
+  "/diet-plan": handleDietPlan,
+  "/weekly-plan": handleWeeklyPlan,
+  "/swap-recipe": handleSwapRecipe,
+  "/grocery-list": handleGroceryList,
+};
+
 export default {
   async fetch(request, env, ctx): Promise<Response> {
     if (request.method === "OPTIONS") {
@@ -34,18 +47,11 @@ export default {
       return withCors(Response.json({ status: "ok" }));
     }
 
-    if (url.pathname === "/coach" && request.method === "POST") {
+    if (request.method === "POST" && url.pathname in AUTHENTICATED_ROUTES) {
       if (!isAuthorized(request, env)) {
         return withCors(Response.json({ error: "Unauthorized" }, { status: 401 }));
       }
-      return withCors(await handleCoach(request, env));
-    }
-
-    if (url.pathname === "/diet-plan" && request.method === "POST") {
-      if (!isAuthorized(request, env)) {
-        return withCors(Response.json({ error: "Unauthorized" }, { status: 401 }));
-      }
-      return withCors(await handleDietPlan(request, env));
+      return withCors(await AUTHENTICATED_ROUTES[url.pathname](request, env));
     }
 
     return withCors(new Response("Not found", { status: 404 }));

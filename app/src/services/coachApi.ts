@@ -1,4 +1,4 @@
-import type { ChatMessage } from "../data/types";
+import type { ChatMessage, DayPlan, GroceryCategory, MealType } from "../data/types";
 
 export type { ChatMessage };
 
@@ -9,6 +9,19 @@ export type CoachResponse = {
 
 export type DietPlanResponse = {
   plan: string;
+};
+
+export type WeeklyPlanResponse = {
+  introNote: string;
+  days: DayPlan[];
+};
+
+export type SwapRecipeResponse = {
+  recipe: string;
+};
+
+export type GroceryListResponse = {
+  categories: GroceryCategory[];
 };
 
 const PROXY_URL = process.env.EXPO_PUBLIC_PROXY_URL;
@@ -50,4 +63,26 @@ export async function generateDietPlan(
   profile: Record<string, string | null>
 ): Promise<DietPlanResponse> {
   return postToProxy<DietPlanResponse>("/diet-plan", { profile }, "Diet plan");
+}
+
+export async function generateWeeklyPlan(
+  profile: Record<string, string | null>
+): Promise<WeeklyPlanResponse> {
+  return postToProxy<WeeklyPlanResponse>("/weekly-plan", { profile }, "Weekly plan");
+}
+
+export async function swapRecipe(
+  profile: Record<string, string | null>,
+  mealType: MealType,
+  avoidRecipes: string[]
+): Promise<SwapRecipeResponse> {
+  return postToProxy<SwapRecipeResponse>(
+    "/swap-recipe",
+    { profile, mealType, avoidRecipes },
+    "Recipe swap"
+  );
+}
+
+export async function generateGroceryList(days: DayPlan[]): Promise<GroceryListResponse> {
+  return postToProxy<GroceryListResponse>("/grocery-list", { days }, "Grocery list");
 }

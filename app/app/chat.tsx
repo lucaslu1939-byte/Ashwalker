@@ -18,6 +18,7 @@ import {
   getMessages,
 } from "../src/data/repositories/conversationRepository";
 import { getProfile, updateFields } from "../src/data/repositories/profileRepository";
+import { colors } from "../src/theme/colors";
 
 export default function Chat() {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function Chat() {
     return (
       <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
         <View style={styles.loading}>
-          <ActivityIndicator />
+          <ActivityIndicator color={colors.ink} />
         </View>
       </SafeAreaView>
     );
@@ -86,8 +87,8 @@ export default function Chat() {
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Ashwalker</Text>
-        <TouchableOpacity onPress={() => router.push("/plan")}>
-          <Text style={styles.headerLink}>My Plan</Text>
+        <TouchableOpacity onPress={() => router.push("/dashboard")}>
+          <Text style={styles.headerLink}>My Week</Text>
         </TouchableOpacity>
       </View>
       <KeyboardAvoidingView
@@ -106,7 +107,14 @@ export default function Chat() {
                 item.role === "user" ? styles.userBubble : styles.assistantBubble,
               ]}
             >
-              <Text style={styles.bubbleText}>{item.content}</Text>
+              <Text
+                style={[
+                  styles.bubbleText,
+                  item.role === "user" ? styles.userBubbleText : styles.assistantBubbleText,
+                ]}
+              >
+                {item.content}
+              </Text>
             </View>
           )}
         />
@@ -119,9 +127,14 @@ export default function Chat() {
           </View>
         )}
         {__DEV__ && (
-          <TouchableOpacity style={styles.devLink} onPress={() => router.push("/dev-profile")}>
-            <Text style={styles.devLinkText}>dev: view profile</Text>
-          </TouchableOpacity>
+          <View style={styles.devLinkRow}>
+            <TouchableOpacity onPress={() => router.push("/dev-profile")}>
+              <Text style={styles.devLinkText}>dev: view profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/dashboard-preview")}>
+              <Text style={styles.devLinkText}>dev: design preview</Text>
+            </TouchableOpacity>
+          </View>
         )}
         <View style={styles.inputRow}>
           <TextInput
@@ -129,12 +142,13 @@ export default function Chat() {
             value={input}
             onChangeText={setInput}
             placeholder="Type a message..."
+            placeholderTextColor={colors.inkFaint}
             editable={!sending}
             multiline
           />
           <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={sending}>
             {sending ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={colors.bg} />
             ) : (
               <Text style={styles.sendButtonText}>Send</Text>
             )}
@@ -148,7 +162,7 @@ export default function Chat() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: "row",
@@ -157,15 +171,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#DDD",
+    borderBottomColor: colors.hairline,
   },
   headerTitle: {
+    fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 17,
-    fontWeight: "700",
+    color: colors.ink,
   },
   headerLink: {
-    color: "#3E7C59",
-    fontWeight: "600",
+    fontFamily: "Inter_600SemiBold",
+    color: colors.accentLink,
   },
   flex: {
     flex: 1,
@@ -181,30 +196,42 @@ const styles = StyleSheet.create({
   },
   bubble: {
     maxWidth: "80%",
-    borderRadius: 16,
+    borderRadius: 18,
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 8,
   },
   userBubble: {
     alignSelf: "flex-end",
-    backgroundColor: "#DCEFE3",
+    backgroundColor: colors.ink,
   },
   assistantBubble: {
     alignSelf: "flex-start",
-    backgroundColor: "#F1F1F1",
+    backgroundColor: colors.bgElev,
+    borderWidth: 1,
+    borderColor: colors.hairline,
   },
   bubbleText: {
+    fontFamily: "Inter_500Medium",
     fontSize: 15,
-    lineHeight: 20,
+    lineHeight: 21,
   },
-  devLink: {
-    alignItems: "center",
+  userBubbleText: {
+    color: colors.bg,
+  },
+  assistantBubbleText: {
+    color: colors.ink,
+  },
+  devLinkRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
     paddingBottom: 4,
   },
   devLinkText: {
+    fontFamily: "Inter_500Medium",
     fontSize: 11,
-    color: "#AAA",
+    color: colors.inkFaint,
   },
   errorRow: {
     flexDirection: "row",
@@ -216,37 +243,42 @@ const styles = StyleSheet.create({
   },
   error: {
     flex: 1,
-    color: "#B00020",
+    fontFamily: "Inter_500Medium",
+    color: "#ff8a8a",
   },
   retryText: {
-    color: "#3E7C59",
-    fontWeight: "600",
+    fontFamily: "Inter_600SemiBold",
+    color: colors.accentLink,
   },
   inputRow: {
     flexDirection: "row",
     alignItems: "flex-end",
     padding: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#DDD",
+    borderTopColor: colors.hairline,
     gap: 8,
   },
   input: {
     flex: 1,
+    fontFamily: "Inter_400Regular",
+    fontSize: 15,
+    color: colors.ink,
     borderWidth: 1,
-    borderColor: "#DDD",
+    borderColor: colors.hairline,
+    backgroundColor: colors.bgElev,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
     maxHeight: 120,
   },
   sendButton: {
-    backgroundColor: "#3E7C59",
+    backgroundColor: colors.ink,
     borderRadius: 20,
     paddingHorizontal: 18,
     paddingVertical: 12,
   },
   sendButtonText: {
-    color: "#fff",
-    fontWeight: "600",
+    fontFamily: "Inter_700Bold",
+    color: colors.bg,
   },
 });

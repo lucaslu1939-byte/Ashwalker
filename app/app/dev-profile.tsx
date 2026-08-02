@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getProfile } from "../src/data/repositories/profileRepository";
+import { colors } from "../src/theme/colors";
 
 // Dev-only screen for verifying the update_profile tool is actually
 // capturing intake data. Not linked from anywhere end users would find.
@@ -47,7 +48,7 @@ export default function DevProfile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: "row",
@@ -55,38 +56,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#DDD",
+    borderBottomColor: colors.hairline,
   },
   title: {
+    fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 18,
-    fontWeight: "700",
+    color: colors.ink,
   },
   back: {
-    color: "#3E7C59",
-    fontWeight: "600",
+    fontFamily: "Inter_600SemiBold",
+    color: colors.accentLink,
   },
   content: {
     padding: 16,
     gap: 12,
   },
   empty: {
-    color: "#888",
+    fontFamily: "Inter_500Medium",
+    color: colors.inkFaint,
     fontStyle: "italic",
   },
   row: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#EEE",
+    borderBottomColor: colors.hairline,
     paddingBottom: 8,
   },
   key: {
+    fontFamily: "Inter_700Bold",
     fontSize: 13,
-    fontWeight: "700",
-    color: "#3E7C59",
+    color: colors.accentLink,
     textTransform: "uppercase",
   },
   value: {
+    fontFamily: "Inter_400Regular",
     fontSize: 15,
     marginTop: 2,
-    color: "#222",
+    color: colors.ink,
   },
 });

@@ -17,6 +17,7 @@ import {
   DISCLAIMER_TITLE,
 } from "../src/data/disclaimerText";
 import { recordConsent } from "../src/data/repositories/consentRepository";
+import { colors } from "../src/theme/colors";
 
 const SCROLL_END_THRESHOLD = 24;
 
@@ -82,7 +83,7 @@ export default function Consent() {
           onPress={handleAgree}
           disabled={!reachedEnd || submitting}
         >
-          <Text style={styles.buttonText}>
+          <Text style={[styles.buttonText, !reachedEnd && styles.buttonTextDisabled]}>
             {reachedEnd ? "I understand and agree" : "Scroll to read more"}
           </Text>
         </TouchableOpacity>
@@ -94,7 +95,7 @@ export default function Consent() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.bg,
   },
   scroll: {
     flex: 1,
@@ -104,41 +105,49 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   title: {
+    fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 24,
-    fontWeight: "700",
+    color: colors.ink,
     marginBottom: 8,
   },
   paragraph: {
+    fontFamily: "Inter_400Regular",
     fontSize: 15,
-    lineHeight: 22,
-    color: "#333",
+    lineHeight: 23,
+    color: colors.ink,
   },
   bold: {
-    fontWeight: "700",
-    color: "#111",
+    fontFamily: "Inter_700Bold",
+    color: colors.ink,
   },
   footer: {
     marginTop: 8,
+    fontFamily: "Inter_500Medium",
     fontStyle: "italic",
-    color: "#555",
+    color: colors.inkDim,
   },
   buttonRow: {
     padding: 16,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#DDD",
+    borderTopColor: colors.hairline,
   },
   button: {
-    backgroundColor: "#3E7C59",
+    backgroundColor: colors.ink,
     borderRadius: 24,
     paddingVertical: 14,
     alignItems: "center",
   },
   buttonDisabled: {
-    backgroundColor: "#A9C7B7",
+    backgroundColor: colors.bgElev,
+    borderWidth: 1,
+    borderColor: colors.hairline,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "600",
+    fontFamily: "Inter_700Bold",
+    color: colors.bg,
     fontSize: 16,
+  },
+  buttonTextDisabled: {
+    color: colors.inkFaint,
   },
 });

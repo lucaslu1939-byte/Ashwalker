@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { generateDietPlan } from "../src/services/coachApi";
 import { getProfile } from "../src/data/repositories/profileRepository";
 import { getLatestPlan, savePlan } from "../src/data/repositories/planRepository";
+import { colors } from "../src/theme/colors";
 
 export default function Plan() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export default function Plan() {
       <ScrollView contentContainerStyle={styles.content}>
         {!loaded && (
           <View style={styles.centered}>
-            <ActivityIndicator />
+            <ActivityIndicator color={colors.ink} />
           </View>
         )}
 
@@ -81,7 +82,7 @@ export default function Plan() {
 
         {generating && (
           <View style={styles.centered}>
-            <ActivityIndicator />
+            <ActivityIndicator color={colors.ink} />
             <Text style={styles.generatingText}>Putting your plan together...</Text>
           </View>
         )}
@@ -97,7 +98,7 @@ export default function Plan() {
           onPress={handleGenerate}
           disabled={generating}
         >
-          <Text style={styles.buttonText}>
+          <Text style={[styles.buttonText, generating && styles.buttonTextDisabled]}>
             {generating ? "Generating..." : plan ? "Regenerate my plan" : "Generate my plan"}
           </Text>
         </TouchableOpacity>
@@ -109,7 +110,7 @@ export default function Plan() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: "row",
@@ -118,15 +119,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#DDD",
+    borderBottomColor: colors.hairline,
   },
   headerTitle: {
+    fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 17,
-    fontWeight: "700",
+    color: colors.ink,
   },
   headerLink: {
-    color: "#3E7C59",
-    fontWeight: "600",
+    fontFamily: "Inter_600SemiBold",
+    color: colors.accentLink,
   },
   headerSpacer: {
     width: 40,
@@ -143,41 +145,50 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   generatingText: {
-    color: "#666",
+    fontFamily: "Inter_500Medium",
+    color: colors.inkDim,
   },
   empty: {
-    color: "#666",
+    fontFamily: "Inter_500Medium",
+    color: colors.inkDim,
     fontSize: 15,
     lineHeight: 22,
     textAlign: "center",
     paddingTop: 40,
   },
   planText: {
+    fontFamily: "Inter_400Regular",
     fontSize: 15,
     lineHeight: 23,
-    color: "#222",
+    color: colors.ink,
   },
   error: {
-    color: "#B00020",
+    fontFamily: "Inter_500Medium",
+    color: "#ff8a8a",
     marginTop: 16,
   },
   buttonRow: {
     padding: 16,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#DDD",
+    borderTopColor: colors.hairline,
   },
   button: {
-    backgroundColor: "#3E7C59",
+    backgroundColor: colors.ink,
     borderRadius: 24,
     paddingVertical: 14,
     alignItems: "center",
   },
   buttonDisabled: {
-    backgroundColor: "#A9C7B7",
+    backgroundColor: colors.bgElev,
+    borderWidth: 1,
+    borderColor: colors.hairline,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "600",
+    fontFamily: "Inter_700Bold",
+    color: colors.bg,
     fontSize: 16,
+  },
+  buttonTextDisabled: {
+    color: colors.inkFaint,
   },
 });
