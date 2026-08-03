@@ -33,3 +33,11 @@ export type WeeklyPlan = {
   days: DayPlan[];
   groceryList: GroceryCategory[] | null;
 };
+
+export type BookSource = {
+  id: number;
+  title: string;
+  sourceText: string;
+  charCount: number;
+  createdAt: string;
+};

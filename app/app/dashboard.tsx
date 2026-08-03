@@ -20,6 +20,7 @@ import {
   swapRecipe,
 } from "../src/services/coachApi";
 import { getProfile } from "../src/data/repositories/profileRepository";
+import { getConcatenatedBookNotes } from "../src/data/repositories/bookSourceRepository";
 import {
   getCurrentWeekPlan,
   isStale,
@@ -83,7 +84,8 @@ export default function Dashboard() {
 
     try {
       const profile = await getProfile();
-      const { introNote, days } = await generateWeeklyPlan(profile);
+      const bookNotes = await getConcatenatedBookNotes();
+      const { introNote, days } = await generateWeeklyPlan(profile, bookNotes);
       await saveNewWeeklyPlan(introNote, days);
       setWeekPlan({ weekStartDate: new Date().toISOString(), introNote, days, groceryList: null });
       setSelectedDay(1);

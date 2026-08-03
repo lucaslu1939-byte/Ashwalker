@@ -18,6 +18,7 @@ import {
   getMessages,
 } from "../src/data/repositories/conversationRepository";
 import { getProfile, updateFields } from "../src/data/repositories/profileRepository";
+import { getConcatenatedBookNotes } from "../src/data/repositories/bookSourceRepository";
 import { colors } from "../src/theme/colors";
 
 export default function Chat() {
@@ -42,7 +43,8 @@ export default function Chat() {
     setError(null);
 
     try {
-      const { reply, profileUpdates } = await sendCoachMessage(conversation, profile);
+      const bookNotes = await getConcatenatedBookNotes();
+      const { reply, profileUpdates } = await sendCoachMessage(conversation, profile, bookNotes);
       setMessages([...conversation, { role: "assistant", content: reply }]);
       await appendMessage("assistant", reply);
 
@@ -87,9 +89,14 @@ export default function Chat() {
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Ashwalker</Text>
-        <TouchableOpacity onPress={() => router.push("/dashboard")}>
-          <Text style={styles.headerLink}>My Week</Text>
-        </TouchableOpacity>
+        <View style={styles.headerLinks}>
+          <TouchableOpacity onPress={() => router.push("/book-notes")}>
+            <Text style={styles.headerLink}>My Books</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/dashboard")}>
+            <Text style={styles.headerLink}>My Week</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <KeyboardAvoidingView
         style={styles.flex}
@@ -177,6 +184,10 @@ const styles = StyleSheet.create({
     fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 17,
     color: colors.ink,
+  },
+  headerLinks: {
+    flexDirection: "row",
+    gap: 16,
   },
   headerLink: {
     fontFamily: "Inter_600SemiBold",

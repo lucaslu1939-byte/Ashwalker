@@ -25,3 +25,6 @@ proxy/.dev.vars
 # OS / editor
 .DS_Store
 *.log
+
+# Personal book files — never commit (large, copyrighted source material)
+Book/

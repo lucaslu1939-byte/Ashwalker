@@ -41,6 +41,13 @@ export function getDb(): Promise<SQLiteDatabase> {
           instructions_json TEXT NOT NULL,
           created_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS book_sources (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          title TEXT NOT NULL,
+          source_text TEXT NOT NULL,
+          char_count INTEGER NOT NULL,
+          created_at TEXT NOT NULL
+        );
       `);
       return db;
     });

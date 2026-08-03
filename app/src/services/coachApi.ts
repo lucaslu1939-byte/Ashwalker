@@ -54,9 +54,10 @@ async function postToProxy<T>(path: string, body: unknown, label: string): Promi
 
 export async function sendCoachMessage(
   messages: ChatMessage[],
-  profile: Record<string, string | null>
+  profile: Record<string, string | null>,
+  bookNotes?: string
 ): Promise<CoachResponse> {
-  return postToProxy<CoachResponse>("/coach", { messages, profile }, "Coach");
+  return postToProxy<CoachResponse>("/coach", { messages, profile, bookNotes }, "Coach");
 }
 
 export async function generateDietPlan(
@@ -66,9 +67,10 @@ export async function generateDietPlan(
 }
 
 export async function generateWeeklyPlan(
-  profile: Record<string, string | null>
+  profile: Record<string, string | null>,
+  bookNotes?: string
 ): Promise<WeeklyPlanResponse> {
-  return postToProxy<WeeklyPlanResponse>("/weekly-plan", { profile }, "Weekly plan");
+  return postToProxy<WeeklyPlanResponse>("/weekly-plan", { profile, bookNotes }, "Weekly plan");
 }
 
 export async function swapRecipe(

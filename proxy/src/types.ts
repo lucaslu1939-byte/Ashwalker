@@ -15,6 +15,7 @@ export type ChatMessage = {
 export type CoachRequest = {
   messages: ChatMessage[];
   profile?: Record<string, string | null>;
+  bookNotes?: string;
 };
 
 export type CoachResponse = {
@@ -44,6 +45,7 @@ export type DayPlan = {
 
 export type WeeklyPlanRequest = {
   profile?: Record<string, string | null>;
+  bookNotes?: string;
 };
 
 export type WeeklyPlanResponse = {
