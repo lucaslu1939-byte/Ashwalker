@@ -19,6 +19,7 @@ import {
 } from "../src/data/repositories/conversationRepository";
 import { getProfile, updateFields } from "../src/data/repositories/profileRepository";
 import { getConcatenatedBookNotes } from "../src/data/repositories/bookSourceRepository";
+import { getJournalSummaryForPrompt } from "../src/data/repositories/journalRepository";
 import { colors } from "../src/theme/colors";
 
 export default function Chat() {
@@ -43,8 +44,16 @@ export default function Chat() {
     setError(null);
 
     try {
-      const bookNotes = await getConcatenatedBookNotes();
-      const { reply, profileUpdates } = await sendCoachMessage(conversation, profile, bookNotes);
+      const [bookNotes, journalSummary] = await Promise.all([
+        getConcatenatedBookNotes(),
+        getJournalSummaryForPrompt(),
+      ]);
+      const { reply, profileUpdates } = await sendCoachMessage(
+        conversation,
+        profile,
+        bookNotes,
+        journalSummary
+      );
       setMessages([...conversation, { role: "assistant", content: reply }]);
       await appendMessage("assistant", reply);
 
@@ -90,6 +99,9 @@ export default function Chat() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Ashwalker</Text>
         <View style={styles.headerLinks}>
+          <TouchableOpacity onPress={() => router.push("/journal")}>
+            <Text style={styles.headerLink}>Journal</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => router.push("/book-notes")}>
             <Text style={styles.headerLink}>My Books</Text>
           </TouchableOpacity>
@@ -187,10 +199,11 @@ const styles = StyleSheet.create({
   },
   headerLinks: {
     flexDirection: "row",
-    gap: 16,
+    gap: 12,
   },
   headerLink: {
     fontFamily: "Inter_600SemiBold",
+    fontSize: 14,
     color: colors.accentLink,
   },
   flex: {

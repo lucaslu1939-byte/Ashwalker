@@ -21,7 +21,7 @@ export async function handleCoach(request: Request, env: Env): Promise<Response>
 
   const client = createAnthropicClient(env);
   const profile = body.profile ?? {};
-  const system = buildSystemPrompt(profile, body.bookNotes);
+  const system = buildSystemPrompt(profile, body.bookNotes, body.journalSummary);
   const messages: Anthropic.MessageParam[] = body.messages.map((m) => ({
     role: m.role,
     content: m.content,

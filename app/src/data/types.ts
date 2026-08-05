@@ -41,3 +41,15 @@ export type BookSource = {
   charCount: number;
   createdAt: string;
 };
+
+export type JournalEntry = {
+  entryDate: string;
+  mood: number;
+  energy: number;
+  didMorningRoutine: boolean;
+  didMeals: boolean;
+  didMovement: boolean;
+  didMeditation: boolean;
+  notes: string | null;
+  updatedAt: string;
+};

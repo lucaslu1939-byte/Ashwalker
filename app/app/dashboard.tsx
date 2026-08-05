@@ -21,6 +21,7 @@ import {
 } from "../src/services/coachApi";
 import { getProfile } from "../src/data/repositories/profileRepository";
 import { getConcatenatedBookNotes } from "../src/data/repositories/bookSourceRepository";
+import { getJournalSummaryForPrompt } from "../src/data/repositories/journalRepository";
 import {
   getCurrentWeekPlan,
   isStale,
@@ -84,8 +85,11 @@ export default function Dashboard() {
 
     try {
       const profile = await getProfile();
-      const bookNotes = await getConcatenatedBookNotes();
-      const { introNote, days } = await generateWeeklyPlan(profile, bookNotes);
+      const [bookNotes, journalSummary] = await Promise.all([
+        getConcatenatedBookNotes(),
+        getJournalSummaryForPrompt(),
+      ]);
+      const { introNote, days } = await generateWeeklyPlan(profile, bookNotes, journalSummary);
       await saveNewWeeklyPlan(introNote, days);
       setWeekPlan({ weekStartDate: new Date().toISOString(), introNote, days, groceryList: null });
       setSelectedDay(1);

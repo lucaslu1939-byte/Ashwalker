@@ -48,6 +48,17 @@ export function getDb(): Promise<SQLiteDatabase> {
           char_count INTEGER NOT NULL,
           created_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS journal_entries (
+          entry_date TEXT PRIMARY KEY NOT NULL,
+          mood INTEGER NOT NULL CHECK (mood BETWEEN 1 AND 5),
+          energy INTEGER NOT NULL CHECK (energy BETWEEN 1 AND 5),
+          did_morning_routine INTEGER NOT NULL,
+          did_meals INTEGER NOT NULL,
+          did_movement INTEGER NOT NULL,
+          did_meditation INTEGER NOT NULL,
+          notes TEXT,
+          updated_at TEXT NOT NULL
+        );
       `);
       return db;
     });

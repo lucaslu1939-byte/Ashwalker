@@ -72,7 +72,7 @@ export async function handleWeeklyPlan(request: Request, env: Env): Promise<Resp
     const response = await client.messages.create({
       model: COACH_MODEL,
       max_tokens: 6144,
-      system: buildWeeklyPlanSystemPrompt(profile, body.bookNotes),
+      system: buildWeeklyPlanSystemPrompt(profile, body.bookNotes, body.journalSummary),
       messages: [
         {
           role: "user",
