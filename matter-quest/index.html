@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Matter Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a science workbook on graph paper. Header strip, hero + rank card, a grid of five lab stations; each station opens as its own full view. */
+:root{
+  --paper:#F1F5FA; --grid:#DFE7F1; --card:#FFFFFF; --ink:#15223D; --muted:#56657E; --line:#D2DCE9;
+  --hl:#FFD23F; --star:#F2B300; --accent:#1F4FD1; --accent-ink:#FFFFFF;
+  --solid:#96663A; --liquid:#2B7BDB; --gas:#0E9A86; --nonmatter:#B97D00; --eraser:#E2668A; --stone:#8B909A; --sand:#D8AE68;
+  --good:#1B8F52; --good-bg:#E3F5EA; --bad:#CC3F37; --bad-bg:#FCE8E6;
+  --device:#2A3550; --lcd:#CFE8D0; --lcd-ink:#15301B;
+  --display:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1522; --grid:#172133; --card:#162033; --ink:#E7EDF7; --muted:#9AA9C0; --line:#2A3750;
+    --hl:#7A5D00; --star:#FFC933; --accent:#7EA2FF; --accent-ink:#0E1522;
+    --solid:#D39C66; --liquid:#5EA3F5; --gas:#3CC9B2; --nonmatter:#F0B637; --eraser:#F08CA8; --stone:#A3A9B4; --sand:#E2BE7E;
+    --good:#4CCB86; --good-bg:#12301F; --bad:#FF7A70; --bad-bg:#3A1716;
+    --device:#3A4766; --lcd:#CFE8D0; --lcd-ink:#15301B;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1522; --grid:#172133; --card:#162033; --ink:#E7EDF7; --muted:#9AA9C0; --line:#2A3750;
+  --hl:#7A5D00; --star:#FFC933; --accent:#7EA2FF; --accent-ink:#0E1522;
+  --solid:#D39C66; --liquid:#5EA3F5; --gas:#3CC9B2; --nonmatter:#F0B637; --eraser:#F08CA8; --stone:#A3A9B4; --sand:#E2BE7E;
+  --good:#4CCB86; --good-bg:#12301F; --bad:#FF7A70; --bad-bg:#3A1716;
+  --device:#3A4766; --lcd:#CFE8D0; --lcd-ink:#15301B;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  margin:0; background-color:var(--paper); color:var(--ink);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+  font:17px/1.55 var(--body);
+}
+.app{max-width:1040px; margin:0 auto; padding-inline:16px; padding-block:18px 56px}
+h1,h2,h3{font-family:var(--display); font-weight:600; line-height:1.15; text-wrap:balance; margin:0}
+p{margin:0}
+button{font:inherit; color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.mono{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+.eyebrow{font-size:.78rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+.hl{background:linear-gradient(transparent 58%,var(--hl) 58%,var(--hl) 92%,transparent 92%); padding-inline:.08em}
+
+/* Header */
+.top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 20px; padding-bottom:18px; border-bottom:2px solid var(--ink); margin-bottom:28px}
+.brand{display:flex; align-items:center; gap:12px; background:none; border:0; padding:0; cursor:pointer; text-align:left}
+.brand svg{width:42px; height:42px; flex:none}
+.brand-name{font-family:var(--display); font-weight:700; font-size:1.7rem; line-height:1}
+.brand-sub{display:block; font-size:.8rem; color:var(--muted); margin-top:3px}
+.stats{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.pill{display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; background:var(--card); border:1.5px solid var(--line); font-size:.9rem; font-weight:700}
+.pill .star{width:16px; height:16px}
+.icon-btn{cursor:pointer}
+
+/* Buttons */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:10px 20px; border-radius:12px; border:2px solid var(--ink); background:var(--ink); color:var(--paper); font-weight:700; cursor:pointer; transition:transform .12s ease, box-shadow .12s ease; box-shadow:0 3px 0 var(--line)}
+.btn:hover{transform:translateY(-1px); box-shadow:0 4px 0 var(--line)}
+.btn:active{transform:translateY(2px); box-shadow:0 1px 0 var(--line)}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.45; cursor:not-allowed; transform:none}
+.back{background:none; border:0; padding:6px 0; color:var(--muted); font-weight:700; cursor:pointer}
+.back:hover{color:var(--ink)}
+
+/* Stars */
+.stars{display:inline-flex; gap:2px}
+.star{width:22px; height:22px; fill:var(--line)}
+.star.on{fill:var(--star)}
+
+/* Home */
+.hero{display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:24px; align-items:end; margin-bottom:34px}
+.hero h1{font-size:clamp(2rem,5vw,3.1rem); margin-block:8px 14px}
+.lede{max-width:56ch; color:var(--muted); font-size:1.08rem}
+.lede b{color:var(--ink)}
+.rank{background:var(--card); border:2px solid var(--ink); border-radius:var(--r); padding:18px 20px; box-shadow:5px 5px 0 var(--ink)}
+.rank-name{font-family:var(--display); font-size:1.5rem; font-weight:600; margin-block:4px 10px}
+.meter{height:14px; border-radius:999px; background:var(--grid); border:1.5px solid var(--line); overflow:hidden}
+.meter i{display:block; height:100%; background:var(--star); border-radius:999px; transition:width .5s ease}
+.rank-foot{display:flex; justify-content:space-between; gap:10px; margin-top:8px; font-size:.88rem; color:var(--muted)}
+.stations{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr)); gap:16px}
+.st{display:flex; flex-direction:column; gap:10px; background:var(--card); border:1.5px solid var(--line); border-radius:var(--r); padding:18px; position:relative; overflow:hidden}
+.st::before{content:""; position:absolute; inset:0 0 auto 0; height:6px; background:var(--tone)}
+.st-top{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:4px}
+.st-num{font-family:var(--mono); font-size:.8rem; font-weight:700; color:var(--tone)}
+.st h3{font-size:1.35rem}
+.st p{color:var(--muted); font-size:.96rem; flex:1}
+.st .btn{align-self:flex-start}
+.st.notes{background:transparent; border-style:dashed; border-width:2px}
+.st.notes::before{display:none}
+.section-label{margin-block:36px 12px}
+
+/* Station views */
+.station-head{display:flex; flex-direction:column; gap:6px; margin-bottom:20px}
+.station-head h2{font-size:clamp(1.8rem,4.5vw,2.5rem)}
+.intro{color:var(--muted); max-width:62ch}
+.progress{display:flex; align-items:center; gap:12px; margin-bottom:16px}
+.progress .bar{flex:1; height:10px; border-radius:999px; background:var(--card); border:1.5px solid var(--line); overflow:hidden}
+.progress .bar i{display:block; height:100%; width:0; background:var(--accent); transition:width .3s ease}
+.qbox{background:var(--card); border:2px solid var(--ink); border-radius:var(--r); padding:22px; box-shadow:5px 5px 0 var(--ink)}
+.prompt{font-size:1.15rem; font-weight:700; margin-bottom:16px; max-width:62ch}
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:10px}
+.opt{display:flex; align-items:center; gap:12px; text-align:left; padding:12px 14px; min-height:54px; border-radius:12px; border:2px solid var(--line); background:var(--paper); cursor:pointer; transition:border-color .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--ink); transform:translateY(-1px)}
+.opt:disabled{cursor:default}
+.opt-key{flex:none; width:30px; height:30px; display:grid; place-items:center; border-radius:8px; background:var(--card); border:1.5px solid var(--line); font-family:var(--mono); font-weight:700; font-size:.85rem}
+.opt.correct{border-color:var(--good); background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad); background:var(--bad-bg)}
+.opt.big{justify-content:center; font-family:var(--display); font-size:1.3rem; font-weight:600; min-height:72px}
+.fig{margin:0 0 16px; display:flex; flex-wrap:wrap; gap:18px; align-items:flex-end}
+.fig svg{max-width:100%; height:auto}
+.fig figcaption{width:100%; font-size:.88rem; color:var(--muted)}
+.fb{margin-top:16px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px 18px; align-items:center; padding:16px 18px; border-radius:var(--r); border:2px solid; animation:pop .25s ease}
+.fb.good{border-color:var(--good); background:var(--good-bg)}
+.fb.bad{border-color:var(--bad); background:var(--bad-bg)}
+.fb.info{border-color:var(--line); background:var(--card)}
+.fb-mark{font-family:var(--display); font-weight:600; font-size:1.25rem}
+.fb.good .fb-mark{color:var(--good)} .fb.bad .fb-mark{color:var(--bad)}
+.fb-body{grid-column:1; min-width:0}
+.fb .btn{grid-column:2; grid-row:1 / span 2}
+@media (max-width:560px){ .fb{grid-template-columns:minmax(0,1fr)} .fb .btn{grid-column:1; grid-row:auto; justify-self:start} }
+@keyframes pop{from{transform:scale(.97); opacity:.4}to{transform:none; opacity:1}}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.shake{animation:shake .35s ease}
+
+/* Station 1 */
+.specimen{display:flex; flex-direction:column; align-items:center; gap:6px; padding:18px; margin-bottom:16px; border-radius:12px; background:var(--paper); border:2px dashed var(--line)}
+.spec-icon{font-size:4rem; line-height:1.1}
+.spec-name{font-family:var(--display); font-size:1.6rem; font-weight:600; text-align:center}
+.spec-note{font-size:.9rem; color:var(--muted); text-align:center}
+
+/* Station 2 */
+.howto{margin-bottom:12px; font-weight:700}
+.bins{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:18px}
+.bin{display:flex; flex-direction:column; gap:4px; align-items:stretch; text-align:left; padding:14px; min-height:170px; border-radius:var(--r); border:2.5px solid var(--c); background:var(--card); cursor:pointer; transition:transform .12s}
+.bin:hover{transform:translateY(-2px)}
+.bin.armed{box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 30%,transparent)}
+.bin-name{font-family:var(--display); font-size:1.35rem; font-weight:600; color:var(--c)}
+.bin-hint{font-size:.85rem; color:var(--muted)}
+.bin-items{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+.placed{font-size:.82rem; padding:3px 8px; border-radius:999px; background:color-mix(in srgb,var(--c) 15%,var(--card)); border:1px solid var(--c)}
+.tray{display:flex; flex-wrap:wrap; gap:10px; min-height:60px; padding:14px; border-radius:var(--r); border:2px dashed var(--line); background:var(--card)}
+.chip{display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:999px; border:2px solid var(--line); background:var(--paper); font-weight:700; cursor:pointer}
+.chip span{font-size:1.3rem; line-height:1}
+.chip.sel{border-color:var(--accent); background:var(--card); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+@media (max-width:620px){ .bins{grid-template-columns:minmax(0,1fr)} .bin{min-height:0} }
+
+/* Station 3 */
+.lab-block{background:var(--card); border:1.5px solid var(--line); border-radius:var(--r); padding:18px; margin-bottom:18px}
+.lab-block h3{font-size:1.3rem; margin-bottom:4px}
+.lab-block > p{color:var(--muted); margin-bottom:12px}
+.seg{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px}
+.seg button{padding:8px 14px; border-radius:10px; border:2px solid var(--line); background:var(--paper); font-weight:700; cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--c,var(--ink)); background:color-mix(in srgb,var(--c,var(--ink)) 14%,var(--card))}
+canvas{display:block; width:100%; height:auto; border-radius:10px; background:var(--paper); border:1.5px solid var(--line)}
+.caption{margin-top:10px; min-height:3em; padding:10px 14px; border-radius:10px; background:var(--paper); border-left:5px solid var(--c,var(--line))}
+.slider-row{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-block:12px 0}
+.slider-row input{flex:1; min-width:180px; accent-color:var(--accent)}
+.ptable-wrap{overflow-x:auto}
+.ptable{border-collapse:separate; border-spacing:6px; width:100%; min-width:460px}
+.ptable th{font-size:.85rem; text-align:center; color:var(--muted); font-weight:700; padding:4px}
+.ptable th[scope="row"]{text-align:left; font-family:var(--display); font-size:1.15rem; color:var(--c)}
+.cell{width:100%; min-height:46px; border-radius:10px; border:2px solid var(--line); background:var(--paper); font-weight:700; cursor:pointer}
+.cell.ok{border-color:var(--good); background:var(--good-bg)}
+.cell.no{border-color:var(--bad); background:var(--bad-bg)}
+
+/* Station 4 figures */
+.cyl{width:190px; max-width:100%}
+.cyl-wrap{display:flex; flex-direction:column; align-items:center; gap:4px; font-weight:700; font-size:.9rem}
+.numform{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.numform input{width:140px; min-height:48px; padding:8px 12px; font:700 1.2rem var(--mono); border-radius:10px; border:2px solid var(--line); background:var(--paper); color:var(--ink)}
+.numform.correct input{border-color:var(--good); background:var(--good-bg)}
+.numform.wrong input{border-color:var(--bad); background:var(--bad-bg)}
+.unit{font-weight:700; color:var(--muted)}
+.tip{font-size:.9rem; color:var(--muted); margin-top:10px}
+
+/* SVG diagram classes (all colours from tokens) */
+.d-line{fill:none; stroke:var(--ink); stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round}
+.d-thin{fill:none; stroke:var(--muted); stroke-width:1.2}
+.d-water{fill:var(--liquid); fill-opacity:.32}
+.d-surface{fill:none; stroke:var(--liquid); stroke-width:2}
+.d-air{fill:var(--gas); fill-opacity:.16}
+.d-mask{fill:var(--card)}
+.d-clay{fill:var(--solid); fill-opacity:.75}
+.d-tissue{fill:var(--card); stroke:var(--muted); stroke-dasharray:3 2}
+.d-stone{fill:var(--stone)}
+.d-sand{fill:var(--sand)}
+.d-pan{fill:var(--muted)}
+.d-body{fill:var(--device)}
+.d-screen{fill:var(--lcd)}
+.d-read{fill:var(--lcd-ink); font:700 15px var(--mono)}
+.d-lab{fill:var(--muted); font:600 12px var(--body)}
+.d-ink{fill:var(--ink)}
+.tick{stroke:var(--ink); stroke-width:1}
+.tick.major{stroke-width:1.6}
+.tlab{fill:var(--ink); font:600 10px var(--mono); text-anchor:end}
+
+/* Results */
+.results{text-align:center; background:var(--card); border:2px solid var(--ink); border-radius:var(--r); padding:30px 20px; box-shadow:5px 5px 0 var(--ink)}
+.results .stars .star{width:58px; height:58px}
+.results h2{font-size:2rem; margin-block:12px 6px}
+.results .score{font-family:var(--mono); font-size:1.15rem; font-weight:700}
+.results .msg{color:var(--muted); margin:8px auto 20px; max-width:46ch}
+.row{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+
+/* Notebook */
+.notes-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr)); gap:16px}
+.note{background:var(--card); border:1.5px solid var(--line); border-radius:var(--r); padding:20px}
+.note h3{font-size:1.3rem; margin-bottom:10px}
+.note p,.note li{max-width:65ch}
+.note ul{margin:8px 0 0; padding-left:20px; display:grid; gap:6px}
+.def{font-size:1.1rem; padding:12px 14px; border-radius:10px; background:var(--paper); border-left:5px solid var(--star); margin-bottom:10px}
+.ntable{border-collapse:collapse; width:100%; min-width:420px; font-size:.95rem}
+.ntable th,.ntable td{padding:8px 10px; border-bottom:1.5px solid var(--line); text-align:left}
+.ntable thead th{font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.ntable tbody th{font-family:var(--display); font-weight:600; font-size:1.05rem}
+
+@media (max-width:760px){ .hero{grid-template-columns:minmax(0,1fr)} }
+@media (prefers-reduced-motion: reduce){ *,*::before,*::after{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <button class="brand" data-go="home" aria-label="Matter Quest home">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M18 5h12M20 5v13L8 39a4 4 0 0 0 3.5 6h25A4 4 0 0 0 40 39L28 18V5" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="M13.5 31h21L39 39a2.5 2.5 0 0 1-2.2 3.6H11.2A2.5 2.5 0 0 1 9 39z" fill="var(--liquid)" fill-opacity=".55"/>
+        <circle cx="20" cy="37" r="2.2" fill="var(--paper)"/><circle cx="27" cy="34" r="1.6" fill="var(--paper)"/><circle cx="24" cy="25" r="1.8" fill="var(--gas)"/>
+      </svg>
+      <span><span class="brand-name">Matter Quest</span><span class="brand-sub">Primary 4 Science · Cycles · Matter</span></span>
+    </button>
+    <div class="stats" id="stats"></div>
+  </header>
+  <main id="view" aria-live="polite"></main>
+</div>
+
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const view = $('#view');
+const STORE = 'matter-quest-v1';
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let state = { best: {}, xp: 0, sound: true };
+
+function load() { try { const s = JSON.parse(localStorage.getItem(STORE)); if (s) state = { ...state, ...s }; } catch (e) {} }
+function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const rand = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+const randEven = (lo, hi) => 2 * rand(Math.ceil(lo / 2), Math.floor(hi / 2));
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- Sound ---------- */
+let actx;
+function sfx(kind) {
+  if (!state.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const notes = kind === 'good' ? [523, 784] : kind === 'bad' ? [233, 196] : [392, 523, 659, 784];
+    notes.forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = kind === 'bad' ? 'square' : 'triangle';
+      o.frequency.value = f;
+      const t = actx.currentTime + i * 0.1, peak = kind === 'bad' ? 0.05 : 0.12;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+      o.connect(g).connect(actx.destination);
+      o.start(t); o.stop(t + 0.22);
+    });
+  } catch (e) {}
+}
+
+/* ---------- Stars, ranks, header ---------- */
+const STAR = on => `<svg viewBox="0 0 24 24" class="star${on ? ' on' : ''}" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>`;
+const starRow = n => `<span class="stars" role="img" aria-label="${n} of 3 stars">${[0, 1, 2].map(k => STAR(k < n)).join('')}</span>`;
+const RANKS = [[0, 'Curious Explorer'], [4, 'Lab Assistant'], [8, 'Junior Scientist'], [12, 'Senior Scientist'], [15, 'Matter Master']];
+const totalStars = () => Object.values(state.best).reduce((a, b) => a + b, 0);
+function rankInfo() {
+  const s = totalStars();
+  let i = 0; RANKS.forEach((r, k) => { if (s >= r[0]) i = k; });
+  return { stars: s, name: RANKS[i][1], next: RANKS[i + 1] };
+}
+function renderHeader() {
+  const r = rankInfo();
+  $('#stats').innerHTML = `
+    <span class="pill" title="Stars earned">${STAR(true)}<span class="mono">${r.stars}/15</span></span>
+    <span class="pill" title="Experience points"><span class="mono">${state.xp} XP</span></span>
+    <button class="pill icon-btn" id="soundBtn" aria-pressed="${state.sound}">${state.sound ? 'Sound on' : 'Sound off'}</button>`;
+  $('#soundBtn').onclick = () => { state.sound = !state.sound; save(); renderHeader(); if (state.sound) sfx('good'); };
+}
+
+/* ---------- Content ---------- */
+const MATTER_ITEMS = [
+  { name: 'Air', icon: '🌬️', m: true, why: 'Air has mass and takes up space. A ball becomes heavier after air is pumped into it.' },
+  { name: 'Water', icon: '💧', m: true, why: 'Water has mass and takes up space in a cup or bottle.' },
+  { name: 'Rock', icon: '🪨', m: true, why: 'A rock has mass and takes up space.' },
+  { name: 'Milk', icon: '🥛', m: true, why: 'Milk has mass and takes up space in its carton.' },
+  { name: 'Water vapour (steam)', icon: '♨️', m: true, why: 'Water vapour is water in the gas state. All gases have mass and occupy space.' },
+  { name: 'Cloud', icon: '☁️', m: true, why: 'A cloud is made of tiny water droplets, so it has mass and occupies space.' },
+  { name: 'Sand', icon: '🏖️', m: true, why: 'Every grain of sand has mass and takes up space.' },
+  { name: 'Oxygen', icon: '🫧', m: true, why: 'Oxygen is a gas. Gases have mass and occupy space, so they are matter.' },
+  { name: 'Ice', icon: '🧊', m: true, why: 'Ice is water in the solid state. It has mass and takes up space.' },
+  { name: 'Your body', icon: '🧍', m: true, why: 'You can weigh yourself, and you take up space. Your body is matter.' },
+  { name: 'Cooking oil', icon: '🫒', m: true, why: 'Cooking oil is a liquid. It has mass and takes up space.' },
+  { name: 'Light from a torch', icon: '🔦', m: false, why: 'The torch is matter, but its light has no mass and does not take up space.' },
+  { name: 'Sound of a bell', icon: '🔔', m: false, why: 'Sound has no mass and does not occupy space.' },
+  { name: 'Heat from a fire', icon: '🔥', m: false, why: 'Heat is a form of energy. It has no mass and takes up no space.' },
+  { name: 'Shadow', icon: '👤', m: false, why: 'A shadow forms where light is blocked. It has no mass and takes up no space.' },
+  { name: 'Rainbow', icon: '🌈', m: false, why: 'A rainbow is light split into colours. Light is not matter.' },
+  { name: 'Electricity', icon: '⚡', m: false, why: 'Electricity is a form of energy. It has no mass and does not occupy space.' },
+  { name: 'Happiness', icon: '😊', m: false, why: 'Feelings have no mass and take up no space.' },
+  { name: 'A thought', icon: '💭', m: false, why: 'Thoughts and ideas have no mass and do not occupy space.' },
+];
+
+const STATE_ITEMS = {
+  solid: [
+    { name: 'Ice cube', icon: '🧊', why: 'An ice cube keeps its own shape and volume. It is a solid.' },
+    { name: 'Wooden block', icon: '🪵', why: 'A wooden block has a definite shape and a definite volume.' },
+    { name: 'Coin', icon: '🪙', why: 'A coin keeps its shape and volume in any container.' },
+    { name: 'Sand', icon: '🏖️', why: 'Sand can be poured, but each grain keeps its own shape and volume. Sand is a solid.' },
+    { name: 'Sponge', icon: '🧽', why: 'A sponge can be squeezed because of the air in its holes, but the sponge material is a solid.' },
+    { name: 'Salt', icon: '🧂', why: 'Each grain of salt has a definite shape and volume. Salt is a solid.' },
+    { name: 'Pencil', icon: '✏️', why: 'A pencil keeps its shape and volume. It is a solid.' },
+  ],
+  liquid: [
+    { name: 'Orange juice', icon: '🧃', why: 'Juice takes the shape of its container but keeps the same volume. It is a liquid.' },
+    { name: 'Honey', icon: '🍯', why: 'Honey flows slowly, but it still takes the shape of its container. It is a liquid.' },
+    { name: 'Milk', icon: '🥛', why: 'Milk has a definite volume and takes the shape of its container.' },
+    { name: 'Cooking oil', icon: '🫒', why: 'Oil can be poured and takes the shape of its container. It is a liquid.' },
+    { name: 'Seawater', icon: '🌊', why: 'Seawater has a definite volume but no definite shape. It is a liquid.' },
+    { name: 'Liquid soap', icon: '🧴', why: 'Liquid soap takes the shape of the bottle it is in. It is a liquid.' },
+  ],
+  gas: [
+    { name: 'Air in a balloon', icon: '🎈', why: 'Air spreads out to fill the whole balloon. It is a gas.' },
+    { name: 'Water vapour', icon: '♨️', why: 'Water vapour is water in the gas state. It has no definite shape or volume.' },
+    { name: 'Oxygen in a diving tank', icon: '🤿', why: 'Oxygen is a gas. Lots of it is squeezed (compressed) into the tank.' },
+    { name: 'Bubbles in a fizzy drink', icon: '🫧', why: 'The bubbles are carbon dioxide, which is a gas.' },
+    { name: 'Air in a bicycle tyre', icon: '🚲', why: 'Air is a gas. It can be compressed, which is why we can pump more into a tyre.' },
+    { name: 'Cooking gas', icon: '🔥', why: 'Cooking gas spreads out to fill its container. It is a gas.' },
+  ],
+};
+
+const DIAGRAMS = {
+  cup: `<svg viewBox="0 0 300 175" width="300" role="img" aria-label="An upside-down cup with a dry tissue inside, pushed into a tank of water">
+    <path d="M20 30 V162 H220 V30" class="d-line"/>
+    <rect x="22" y="70" width="196" height="90" class="d-water"/>
+    <line x1="22" y1="70" x2="218" y2="70" class="d-surface"/>
+    <path d="M92 42 H148 L156 118 H84 Z" class="d-mask"/>
+    <path d="M92 42 H148 L156 118 H84 Z" class="d-air"/>
+    <rect x="84" y="118" width="72" height="4" class="d-water"/>
+    <rect x="96" y="44" width="48" height="10" rx="2" class="d-tissue"/>
+    <path d="M90 40 H150 L160 124 M90 40 L80 124" class="d-line"/>
+    <path d="M120 6 V30 M113 22 L120 31 L127 22" class="d-line"/>
+    <line x1="146" y1="49" x2="232" y2="49" class="d-thin"/><text x="236" y="53" class="d-lab">dry tissue</text>
+    <line x1="140" y1="90" x2="232" y2="90" class="d-thin"/><text x="236" y="94" class="d-lab">air</text>
+    <line x1="200" y1="140" x2="232" y2="140" class="d-thin"/><text x="236" y="144" class="d-lab">water</text>
+  </svg>`,
+  funnel: `<svg viewBox="0 0 300 190" width="300" role="img" aria-label="A funnel through plasticine sealing the mouth of a flask; water stays in the funnel">
+    <path d="M107 92 L57 176 H183 L133 92 Z" class="d-air"/>
+    <path d="M105 64 V92 L55 178 H185 L135 92 V64" class="d-line"/>
+    <rect x="98" y="58" width="44" height="18" rx="4" class="d-clay"/>
+    <path d="M92 20 H148 L124 41 V50 H116 V41 Z" class="d-water"/>
+    <line x1="92" y1="20" x2="148" y2="20" class="d-surface"/>
+    <path d="M80 10 L116 42 V104 M160 10 L124 42 V104" class="d-line"/>
+    <line x1="150" y1="24" x2="196" y2="24" class="d-thin"/><text x="200" y="28" class="d-lab">water</text>
+    <line x1="142" y1="67" x2="196" y2="67" class="d-thin"/><text x="200" y="71" class="d-lab">plasticine</text>
+    <line x1="150" y1="140" x2="196" y2="140" class="d-thin"/><text x="200" y="144" class="d-lab">air</text>
+  </svg>`,
+  syringe: `<svg viewBox="0 0 310 110" width="310" role="img" aria-label="A syringe with a sealed tip, containing air, with the plunger being pushed">
+    <rect x="52" y="37" width="96" height="36" class="d-air"/>
+    <rect x="50" y="35" width="180" height="40" rx="3" class="d-line"/>
+    <rect x="32" y="48" width="18" height="14" class="d-line"/>
+    <rect x="22" y="45" width="10" height="20" rx="2" class="d-clay"/>
+    <rect x="148" y="37" width="8" height="36" class="d-ink"/>
+    <path d="M156 55 H262 M262 36 V74" class="d-line" style="stroke-width:5"/>
+    <path d="M300 55 H272 M280 48 L271 55 L280 62" class="d-line"/>
+    <text x="90" y="60" class="d-lab">air</text>
+    <text x="8" y="95" class="d-lab">sealed tip</text>
+    <text x="252" y="95" class="d-lab">push</text>
+  </svg>`,
+};
+
+// Answer is always options[0]; options are shuffled when shown.
+const EXAM = [
+  { prompt: 'Matter is anything that…', options: ['has mass and occupies space', 'can be seen', 'can be touched', 'has a colour'], explain: 'Air cannot be seen and is hard to feel, but it has mass and occupies space, so it is matter.' },
+  { prompt: 'Which one of these is <u>not</u> matter?', options: ['Sound', 'Air', 'Water vapour', 'Sand'], explain: 'Sound has no mass and does not take up space. Air, water vapour and sand are all matter.' },
+  { figure: DIAGRAMS.cup, prompt: 'Mei Ling stuck a dry tissue to the bottom of a cup. She turned the cup upside down and pushed it straight down into a tank of water. The tissue stayed dry. Why?', options: ['The air in the cup occupies space and stops the water from entering', 'Water cannot touch tissue paper', 'The cup soaks up the water', 'Air has mass'], explain: 'The cup is full of air. The air takes up space, so the water cannot rise up to the tissue.' },
+  { figure: DIAGRAMS.funnel, prompt: 'Ahmad sealed the mouth of a flask with plasticine around a funnel. When he poured water into the funnel, the water stayed in the funnel. What should he do so that the water flows into the flask?', options: ['Make a small hole in the plasticine so air can escape', 'Pour the water faster', 'Use a bigger funnel', 'Use colder water'], explain: 'The flask is full of air, which occupies space. Once the air has a way out, water can flow in and take its place.' },
+  { figure: DIAGRAMS.syringe, prompt: 'A syringe with a sealed tip has 60 ml of air. Raju pushes the plunger to the 40 ml mark. What happens to the air inside?', options: ['Its volume decreases but its mass stays the same', 'Both its volume and mass decrease', 'Its volume stays the same but its mass decreases', 'Its volume increases'], explain: 'Gas can be compressed into a smaller space. No air escaped, so the amount of air, and its mass, stays the same.' },
+  { prompt: 'A deflated football has a mass of 400 g. After air is pumped into it, its mass is 412 g. What does this show?', options: ['Air has mass', 'Air has a definite shape', 'Air cannot be compressed', 'Air has a definite volume'], explain: 'The ball became 12 g heavier because of the air pumped in. Air has mass.' },
+  { prompt: 'Substance X has a definite volume but no definite shape. Which could X be?', options: ['Orange juice', 'Ice', 'Steam', 'A stone'], explain: 'A liquid keeps its volume but takes the shape of its container.' },
+  { prompt: '150 ml of water in a tall glass is poured into a flat dish. What is the volume of water in the dish?', options: ['150 ml', 'Less than 150 ml', 'More than 150 ml', 'It depends on the size of the dish'], explain: 'A liquid has a definite volume. Its shape changes but its volume stays at 150 ml.' },
+  { prompt: 'An empty 1.5 l bottle (containing only air) is tightly capped. What is the volume of air inside?', options: ['1.5 l', '0 l', 'Less than 1.5 l', 'It cannot be found'], explain: 'An "empty" bottle is full of air. A gas fills the whole space of its container, so the air has a volume of 1.5 l.' },
+  { prompt: '100 cm³ of gas Y is pumped into an empty, sealed 250 cm³ container. What is the volume of gas Y now?', options: ['250 cm³', '100 cm³', '150 cm³', '350 cm³'], explain: 'A gas has no definite volume. It spreads out to fill the whole container, so its volume is now 250 cm³.' },
+  { prompt: 'Sand can be poured like water. Why is sand still a solid?', options: ['Each grain has a definite shape and a definite volume', 'Sand is dry', 'Sand is heavy', 'Sand can be compressed'], explain: 'Look closely at one grain: it keeps its own shape and volume. That makes sand a solid.' },
+  { prompt: 'Which of these can be compressed?', options: ['Air in a sealed syringe', 'Water in a sealed syringe', 'A wooden block', 'A metal spoon'], explain: 'Only gases can be compressed. Solids and liquids cannot.' },
+  { prompt: 'Liang pressed a ball of plasticine into a flat pancake. Which statement is correct?', options: ['Its shape changed, but its mass and volume stayed the same', 'Its mass decreased', 'Its volume increased', 'It became a liquid'], explain: 'A solid keeps a definite shape unless a force is applied. Pressing it changed the shape only. No plasticine was added or removed.' },
+  { prompt: 'Which instrument measures the mass of an object?', options: ['Electronic balance', 'Measuring cylinder', 'Ruler', 'Thermometer'], explain: 'Mass is measured with a balance, in grams (g) or kilograms (kg).' },
+  { prompt: 'Which unit is used for volume?', options: ['cm³', 'g', 'kg', 'cm'], explain: 'Volume is measured in cm³, ml or l. Grams and kilograms are units of mass. Centimetres measure length.' },
+  { prompt: 'Two identical syringes are sealed. P has 50 ml of air and Q has 50 ml of water. Both plungers are pushed with the same force. What happens?', options: ["P's plunger moves in, but Q's does not", "Both plungers move in", "Q's plunger moves in, but P's does not", 'Neither plunger moves'], explain: 'Air (a gas) can be compressed. Water (a liquid) cannot.' },
+  { prompt: 'Which list shows a solid, a liquid and a gas, in that order?', options: ['Ice, cooking oil, steam', 'Steam, ice, cooking oil', 'Sand, salt, air', 'Milk, honey, oxygen'], explain: 'Ice is a solid, cooking oil is a liquid and steam (water vapour) is a gas.' },
+  { prompt: 'When reading the volume of water in a measuring cylinder, you should…', options: ['read the bottom of the meniscus at eye level', 'read the top of the curve, looking down from above', 'read from below the water level', 'tilt the cylinder towards you'], explain: 'Place the cylinder on a flat table, bend down to eye level, and read the bottom of the curved surface.' },
+  { prompt: 'A balloon gets bigger as air is blown into it. Which property of air does this show?', options: ['Air occupies space', 'Air has a definite shape', 'Air cannot be compressed', 'Air has no mass'], explain: 'The air takes up space inside the balloon and pushes it outwards.' },
+  { prompt: 'A stone is placed in a measuring cylinder with 40 ml of water. The water level rises to 55 ml. What is the volume of the stone?', options: ['15 cm³', '55 cm³', '40 cm³', '95 cm³'], explain: 'Volume of stone = 55 ml − 40 ml = 15 ml = 15 cm³.' },
+];
+
+const STATIONS = [
+  { id: 's1', n: 1, tone: 'nonmatter', name: 'Matter Detector', blurb: 'Is it matter or not? Test each thing: does it have mass and take up space?', start: startS1 },
+  { id: 's2', n: 2, tone: 'liquid', name: 'State Sorter', blurb: 'Sort everyday things into solids, liquids and gases.', start: startS2 },
+  { id: 's3', n: 3, tone: 'gas', name: 'Property Lab', blurb: 'Pour, squeeze and observe. Then fill in the property table.', start: startS3 },
+  { id: 's4', n: 4, tone: 'solid', name: 'Measuring Lab', blurb: 'Read measuring cylinders, find volume by displacement and weigh mass.', start: startS4 },
+  { id: 's5', n: 5, tone: 'accent', name: 'Exam Challenge', blurb: 'Exam-style questions on experiments with air, water and solids.', start: startS5 },
+];
+
+/* ---------- Navigation ---------- */
+let anim = null;
+function stopAnim() { if (anim) { cancelAnimationFrame(anim); anim = null; } }
+function go(name) {
+  stopAnim();
+  if (name === 'home') renderHome();
+  else if (name === 'notes') renderNotes();
+  else { const st = STATIONS.find(s => s.id === name); if (st) st.start(); }
+  window.scrollTo(0, 0);
+}
+document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go); });
+
+function renderHome() {
+  const r = rankInfo();
+  const pct = Math.round(r.stars / 15 * 100);
+  view.innerHTML = `
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Your lab adventure</p>
+        <h1>Almost everything around you is <span class="hl">matter</span>.</h1>
+        <p class="lede">Matter is anything that <b>has mass</b> and <b>occupies space</b>. Visit five lab stations, earn up to three stars at each, and work your way up to Matter Master.</p>
+      </div>
+      <div class="rank" aria-label="Your rank">
+        <p class="eyebrow">Your rank</p>
+        <p class="rank-name">${r.name}</p>
+        <div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="${r.stars}"><i style="width:${pct}%"></i></div>
+        <div class="rank-foot"><span class="mono">${r.stars} / 15 stars</span><span>${r.next ? `${r.next[0] - r.stars} more for ${r.next[1]}` : 'Top rank reached!'}</span></div>
+      </div>
+    </section>
+    <h2 class="section-label eyebrow">Lab stations</h2>
+    <section class="stations">
+      ${STATIONS.map(st => {
+        const b = state.best[st.id] || 0;
+        return `<article class="st" style="--tone:var(--${st.tone})">
+          <div class="st-top"><span class="st-num">STATION ${st.n}</span>${starRow(b)}</div>
+          <h3>${st.name}</h3>
+          <p>${st.blurb}</p>
+          <button class="btn${b ? ' ghost' : ''}" data-go="${st.id}">${b ? 'Play again' : 'Start'}</button>
+        </article>`;
+      }).join('')}
+      <article class="st notes">
+        <div class="st-top"><span class="st-num" style="color:var(--muted)">REVISION</span></div>
+        <h3>Science Notebook</h3>
+        <p>All the key ideas in one place: states of matter, air experiments, and how to measure mass and volume.</p>
+        <button class="btn ghost" data-go="notes">Open notebook</button>
+      </article>
+    </section>`;
+}
+
+function head(st, intro) {
+  return `<div class="station-head">
+    <div><button class="back" data-go="home">← Lab map</button></div>
+    <p class="eyebrow" style="color:var(--${st.tone})">Station ${st.n}</p>
+    <h2>${st.name}</h2>
+    <p class="intro">${intro}</p>
+  </div>`;
+}
+
+/* ---------- Quiz runner ---------- */
+function runQuiz(st, intro, questions) {
+  let i = 0, right = 0;
+  const n = questions.length;
+  view.innerHTML = `${head(st, intro)}
+    <div class="progress"><div class="bar"><i id="pbar"></i></div><span id="pcount" class="mono"></span></div>
+    <div id="qbox" class="qbox"></div>
+    <div id="fb" class="fb" hidden></div>`;
+  const qbox = $('#qbox'), fb = $('#fb');
+  function show() {
+    $('#pbar').style.width = (i / n * 100) + '%';
+    $('#pcount').textContent = `${i + 1} / ${n}`;
+    fb.hidden = true; qbox.innerHTML = '';
+    questions[i].render(qbox, answered);
+  }
+  function answered(ok, explain) {
+    if (ok) right++;
+    sfx(ok ? 'good' : 'bad');
+    $('#pbar').style.width = ((i + 1) / n * 100) + '%';
+    fb.className = 'fb ' + (ok ? 'good' : 'bad');
+    fb.innerHTML = `<div class="fb-mark">${ok ? 'Correct!' : 'Not quite'}</div>
+      <div class="fb-body">${explain}</div>
+      <button class="btn" id="nextBtn">${i + 1 < n ? 'Next question →' : 'See results'}</button>`;
+    fb.hidden = false;
+    if (!ok) qbox.classList.remove('shake'), void qbox.offsetWidth, qbox.classList.add('shake');
+    const nb = $('#nextBtn');
+    nb.onclick = () => { i++; if (i < n) { show(); qbox.scrollIntoView({ block: 'nearest' }); } else finish(st, right, n); };
+    nb.focus({ preventScroll: true });
+    fb.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+  }
+  show();
+}
+
+function finish(st, right, n) {
+  const pct = right / n;
+  const stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
+  const prev = state.best[st.id] || 0;
+  const xp = right * 10;
+  state.xp += xp;
+  state.best[st.id] = Math.max(prev, stars);
+  save(); renderHeader();
+  sfx(stars >= 2 ? 'win' : 'good');
+  const msg = [
+    'Keep going. Read the Science Notebook, then have another go.',
+    'Good start. Read the feedback carefully and try again.',
+    'Well done! A few more correct answers and you will get 3 stars.',
+    'Brilliant! You have mastered this station.',
+  ][stars];
+  view.innerHTML = `${head(st, '')}
+    <section class="results">
+      ${starRow(stars)}
+      <h2>${['Try again', 'Nice try', 'Great work', 'Excellent'][stars]}</h2>
+      <p class="score">${right} / ${n} correct · +${xp} XP</p>
+      ${stars > prev ? `<p class="score" style="color:var(--good); font-size:.95rem; margin-top:6px">New best for this station!</p>` : ''}
+      <p class="msg">${msg}</p>
+      <div class="row">
+        <button class="btn" data-go="${st.id}">Play again</button>
+        <button class="btn ghost" data-go="home">Back to lab map</button>
+        ${stars < 3 ? '<button class="btn ghost" data-go="notes">Open notebook</button>' : ''}
+      </div>
+    </section>`;
+}
+
+function mcq(q) {
+  return {
+    render(box, done) {
+      const order = shuffle(q.options.map((_, k) => k));
+      box.innerHTML = `${q.figure ? `<figure class="fig">${q.figure}</figure>` : ''}
+        <p class="prompt">${q.prompt}</p>
+        <div class="opts">${order.map((k, j) => `<button class="opt" data-k="${k}"><span class="opt-key">${'ABCD'[j]}</span><span>${q.options[k]}</span></button>`).join('')}</div>`;
+      $$('.opt', box).forEach(b => b.onclick = () => {
+        const ok = +b.dataset.k === 0;
+        $$('.opt', box).forEach(x => { x.disabled = true; if (+x.dataset.k === 0) x.classList.add('correct'); });
+        if (!ok) b.classList.add('wrong');
+        done(ok, (ok ? '' : `The answer is <b>${q.options[0]}</b>. `) + q.explain);
+      });
+    }
+  };
+}
+
+function numeric(q) {
+  return {
+    render(box, done) {
+      box.innerHTML = `${q.figure ? `<figure class="fig">${q.figure}</figure>` : ''}
+        <p class="prompt">${q.prompt}</p>
+        <form class="numform" novalidate>
+          <label for="numIn" class="sr">Your answer in ${q.unit}</label>
+          <input id="numIn" type="number" inputmode="decimal" step="any" autocomplete="off" placeholder="?">
+          <span class="unit">${q.unit}</span>
+          <button class="btn" type="submit">Check</button>
+        </form>
+        ${q.tip ? `<p class="tip">${q.tip}</p>` : ''}`;
+      const f = $('form', box), inp = $('input', f);
+      f.onsubmit = e => {
+        e.preventDefault();
+        if (inp.value.trim() === '') { inp.focus(); return; }
+        const ok = Math.abs(Number(inp.value) - q.answer) < 1e-9;
+        inp.disabled = true; $('button', f).disabled = true;
+        f.classList.add(ok ? 'correct' : 'wrong');
+        done(ok, (ok ? '' : `The answer is <b>${q.answer} ${q.unit}</b>. `) + q.explain);
+      };
+    }
+  };
+}
+
+/* ---------- Station 1: Matter Detector ---------- */
+function startS1() {
+  const st = STATIONS[0];
+  const pick = [...shuffle(MATTER_ITEMS.filter(x => x.m)).slice(0, 5), ...shuffle(MATTER_ITEMS.filter(x => !x.m)).slice(0, 5)];
+  const qs = shuffle(pick).map(item => ({
+    render(box, done) {
+      box.innerHTML = `<div class="specimen"><span class="spec-icon" aria-hidden="true">${item.icon}</span><span class="spec-name">${item.name}</span><span class="spec-note">Does it have mass? Does it take up space?</span></div>
+        <div class="opts">
+          <button class="opt big" data-v="1">Matter</button>
+          <button class="opt big" data-v="0">Not matter</button>
+        </div>`;
+      $$('.opt', box).forEach(b => b.onclick = () => {
+        const said = b.dataset.v === '1', ok = said === item.m;
+        $$('.opt', box).forEach(x => { x.disabled = true; if ((x.dataset.v === '1') === item.m) x.classList.add('correct'); });
+        if (!ok) b.classList.add('wrong');
+        done(ok, `<b>${item.name}</b> ${item.m ? 'is' : 'is not'} matter. ${item.why}`);
+      });
+    }
+  }));
+  runQuiz(st, 'Matter is anything that has mass and occupies space. Decide whether each thing is matter.', qs);
+}
+
+/* ---------- Station 2: State Sorter ---------- */
+function startS2() {
+  const st = STATIONS[1];
+  const items = shuffle([
+    ...shuffle(STATE_ITEMS.solid).slice(0, 4).map(x => ({ ...x, s: 'solid' })),
+    ...shuffle(STATE_ITEMS.liquid).slice(0, 4).map(x => ({ ...x, s: 'liquid' })),
+    ...shuffle(STATE_ITEMS.gas).slice(0, 4).map(x => ({ ...x, s: 'gas' })),
+  ]);
+  const BINS = [
+    ['solid', 'Solid', 'Definite shape and definite volume'],
+    ['liquid', 'Liquid', 'Definite volume; takes the shape of its container'],
+    ['gas', 'Gas', 'No definite shape or volume; fills its whole container'],
+  ];
+  let sel = null, placed = 0, firstTry = 0;
+  const missed = new Set();
+  view.innerHTML = `${head(st, 'Every piece of matter here is a solid, a liquid or a gas. Sort them correctly on your first try to earn stars.')}
+    <p class="howto">Tap a card, then tap the bin it belongs in.</p>
+    <div class="bins">${BINS.map(([k, name, hint]) => `<button class="bin" data-s="${k}" style="--c:var(--${k})"><span class="bin-name">${name}</span><span class="bin-hint">${hint}</span><span class="bin-items" id="bin-${k}"></span></button>`).join('')}</div>
+    <div class="tray" id="tray">${items.map((it, k) => `<button class="chip" data-k="${k}" aria-pressed="false"><span aria-hidden="true">${it.icon}</span>${it.name}</button>`).join('')}</div>
+    <div id="fb" class="fb info"><div class="fb-body"><b>${items.length} cards</b> to sort. Pick one to begin.</div></div>`;
+  const fb = $('#fb');
+  const setSel = k => {
+    sel = k;
+    $$('.chip').forEach(c => { const on = +c.dataset.k === k; c.classList.toggle('sel', on); c.setAttribute('aria-pressed', on); });
+    $$('.bin').forEach(b => b.classList.toggle('armed', k !== null));
+  };
+  $$('.chip').forEach(c => c.onclick = () => setSel(sel === +c.dataset.k ? null : +c.dataset.k));
+  $$('.bin').forEach(b => b.onclick = () => {
+    if (sel === null) { fb.className = 'fb info'; fb.innerHTML = '<div class="fb-body">Pick a card from the tray first.</div>'; return; }
+    const it = items[sel], chip = $(`.chip[data-k="${sel}"]`);
+    if (b.dataset.s === it.s) {
+      placed++; if (!missed.has(sel)) firstTry++;
+      sfx('good');
+      $('#bin-' + it.s).insertAdjacentHTML('beforeend', `<span class="placed">${it.icon} ${it.name}</span>`);
+      chip.remove(); setSel(null);
+      fb.className = 'fb good';
+      fb.innerHTML = `<div class="fb-mark">Correct!</div><div class="fb-body">${it.why}</div>`;
+      if (placed === items.length) {
+        fb.innerHTML += `<button class="btn" id="doneBtn">See results</button>`;
+        $('#doneBtn').onclick = () => finish(st, firstTry, items.length);
+        $('#doneBtn').focus({ preventScroll: true });
+        fb.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+      }
+    } else {
+      missed.add(sel); sfx('bad');
+      chip.classList.remove('shake'); void chip.offsetWidth; chip.classList.add('shake');
+      const hint = { solid: 'Does it keep its own shape in any container?', liquid: 'Can it be poured, keeping the same volume?', gas: 'Does it spread out to fill the whole container?' }[b.dataset.s];
+      fb.className = 'fb bad';
+      fb.innerHTML = `<div class="fb-mark">Not a ${b.dataset.s}</div><div class="fb-body">Think again about <b>${it.name}</b>. ${hint}</div>`;
+    }
+  });
+}
+
+/* ---------- Station 3: Property Lab ---------- */
+function setupCanvas(cv, LW, LH) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || LW;
+  if (cv._w !== w) { cv._w = w; cv.width = Math.round(w * dpr); cv.height = Math.round(w * LH / LW * dpr); }
+  const ctx = cv.getContext('2d');
+  const k = cv.width / LW;
+  ctx.setTransform(k, 0, 0, k, 0, 0);
+  ctx.clearRect(0, 0, LW, LH);
+  return ctx;
+}
+const BASE = 255;
+const CONTAINERS = [
+  { name: 'Tall jar', cx: 120, H: 200, w: () => 84 },
+  { name: 'Wide tray', cx: 360, H: 76, w: () => 210 },
+  { name: 'Conical flask', cx: 600, H: 200, w: h => h <= 120 ? 200 - h * (154 / 120) : 46 },
+];
+const WATER_AREA = 8400;
+CONTAINERS.forEach(c => { let a = 0, h = 0; while (a < WATER_AREA && h < c.H) { a += c.w(h) * 0.25; h += 0.25; } c.level = h; });
+function shapePath(ctx, c, top) {
+  ctx.beginPath();
+  ctx.moveTo(c.cx - c.w(top) / 2, BASE - top);
+  for (let h = top; h >= 0; h -= 2) ctx.lineTo(c.cx - c.w(h) / 2, BASE - h);
+  ctx.lineTo(c.cx - c.w(0) / 2, BASE);
+  ctx.lineTo(c.cx + c.w(0) / 2, BASE);
+  for (let h = 0; h <= top; h += 2) ctx.lineTo(c.cx + c.w(h) / 2, BASE - h);
+  ctx.lineTo(c.cx + c.w(top) / 2, BASE - top);
+}
+function insideC(c, x, y) {
+  const h = BASE - y;
+  if (h < 4 || h > c.H - 4) return false;
+  return Math.abs(x - c.cx) < c.w(h) / 2 - 4;
+}
+
+function startS3() {
+  const st = STATIONS[2];
+  const POUR = {
+    solid: { c: 'solid', label: 'Eraser', text: '<b>Solid:</b> the eraser keeps the <b>same shape</b> and the <b>same volume</b> in every container. A solid has a definite shape and a definite volume.' },
+    liquid: { c: 'liquid', label: '100 ml water', text: '<b>Liquid:</b> the same 100 ml of water <b>takes the shape</b> of each container, but its <b>volume stays 100 ml</b>. A liquid has a definite volume but no definite shape.' },
+    gas: { c: 'gas', label: 'Air', text: '<b>Gas:</b> the air <b>spreads out to fill the whole of each sealed container</b>. A gas has no definite shape and no definite volume.' },
+  };
+  let mode = null, t0 = 0, parts = [];
+  let push = 0, firstCheck = null;
+  const tried = new Set();
+  const ANSWERS = { solid: [true, true, false], liquid: [false, true, false], gas: [false, false, true] };
+  const COLS = ['Definite shape?', 'Definite volume?', 'Can be compressed?'];
+  const grid = { solid: [null, null, null], liquid: [null, null, null], gas: [null, null, null] };
+
+  view.innerHTML = `${head(st, 'Run two experiments, then use what you saw to complete the property table. Your stars come from the table.')}
+    <section class="lab-block">
+      <h3>Test 1 · Pour it in</h3>
+      <p>Put the same thing into three different containers. Watch its shape and volume.</p>
+      <div class="seg" id="pourSeg">
+        <button data-m="solid" style="--c:var(--solid)" aria-pressed="false">Drop in an eraser</button>
+        <button data-m="liquid" style="--c:var(--liquid)" aria-pressed="false">Pour in 100 ml of water</button>
+        <button data-m="gas" style="--c:var(--gas)" aria-pressed="false">Fill with air and seal</button>
+      </div>
+      <canvas id="pourCv" aria-label="Three containers: a tall jar, a wide tray and a conical flask"></canvas>
+      <p class="caption" id="pourCap">Choose a test above to begin.</p>
+    </section>
+    <section class="lab-block">
+      <h3>Test 2 · Squeeze it</h3>
+      <p>Both syringes have their tips sealed. One holds 50 ml of air, the other 50 ml of water. Push both plungers with the same force.</p>
+      <canvas id="syrCv" aria-label="Two sealed syringes, one with air and one with water"></canvas>
+      <div class="slider-row">
+        <label for="pushIn"><b>Push force</b></label>
+        <input id="pushIn" type="range" min="0" max="100" value="0">
+        <button class="btn ghost" id="releaseBtn" type="button">Let go</button>
+      </div>
+      <p class="caption" id="syrCap" style="--c:var(--gas)">Drag the slider to push both plungers.</p>
+    </section>
+    <section class="lab-block">
+      <h3>Test 3 · Property table</h3>
+      <p>Tap each box to choose <b>Yes</b> or <b>No</b>. Your first check counts for stars.</p>
+      <div class="ptable-wrap"><table class="ptable">
+        <thead><tr><th></th>${COLS.map(c => `<th scope="col">${c}</th>`).join('')}</tr></thead>
+        <tbody>${['solid', 'liquid', 'gas'].map(r => `<tr><th scope="row" style="--c:var(--${r})">${r[0].toUpperCase() + r.slice(1)}</th>${[0, 1, 2].map(j => `<td><button class="cell" data-r="${r}" data-j="${j}" aria-label="${r}, ${COLS[j]}">?</button></td>`).join('')}</tr>`).join('')}</tbody>
+      </table></div>
+      <div class="row" style="justify-content:flex-start; margin-top:12px"><button class="btn" id="checkBtn">Check my table</button></div>
+      <div id="fb" class="fb" hidden></div>
+    </section>`;
+
+  const pourCv = $('#pourCv'), syrCv = $('#syrCv');
+  $$('#pourSeg button').forEach(b => b.onclick = () => {
+    mode = b.dataset.m; t0 = performance.now(); tried.add(mode);
+    $$('#pourSeg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    const cap = $('#pourCap'); cap.innerHTML = POUR[mode].text; cap.style.setProperty('--c', `var(--${POUR[mode].c})`);
+    if (mode === 'gas') {
+      parts = CONTAINERS.map(c => Array.from({ length: 34 }, () => {
+        const a = Math.random() * Math.PI * 2, sp = 0.8 + Math.random() * 1.2;
+        return { x: c.cx + (Math.random() - 0.5) * 16, y: BASE - c.H + 10 + Math.random() * 8, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp };
+      }));
+    }
+  });
+  const pushIn = $('#pushIn');
+  const updatePush = () => {
+    push = +pushIn.value;
+    const air = Math.round(50 - 30 * push / 100);
+    $('#syrCap').innerHTML = push === 0
+      ? 'Drag the slider to push both plungers.'
+      : `<b>Air:</b> squashed from 50 ml to <b>${air} ml</b>. Gas <b>can be compressed</b>, and its mass stays the same because no air escapes.<br><b>Water:</b> still <b>50 ml</b>. The plunger will not move. Liquids <b>cannot be compressed</b>.`;
+  };
+  pushIn.oninput = updatePush;
+  $('#releaseBtn').onclick = () => { pushIn.value = 0; updatePush(); };
+
+  $$('.cell').forEach(b => b.onclick = () => {
+    const r = b.dataset.r, j = +b.dataset.j;
+    grid[r][j] = grid[r][j] === null ? true : grid[r][j] ? false : true;
+    b.textContent = grid[r][j] ? 'Yes' : 'No';
+    b.classList.remove('ok', 'no');
+  });
+  $('#checkBtn').onclick = () => {
+    const fb = $('#fb');
+    const blanks = Object.values(grid).flat().filter(v => v === null).length;
+    if (blanks) { fb.hidden = false; fb.className = 'fb info'; fb.innerHTML = `<div class="fb-body">Fill in every box first. ${blanks} still ${blanks === 1 ? 'shows' : 'show'} “?”.</div>`; return; }
+    let correct = 0;
+    $$('.cell').forEach(b => {
+      const r = b.dataset.r, j = +b.dataset.j, ok = grid[r][j] === ANSWERS[r][j];
+      if (ok) correct++;
+      b.classList.toggle('ok', ok); b.classList.toggle('no', !ok);
+    });
+    if (firstCheck === null) firstCheck = correct;
+    sfx(correct === 9 ? 'good' : 'bad');
+    fb.hidden = false;
+    if (correct === 9) {
+      fb.className = 'fb good';
+      fb.innerHTML = `<div class="fb-mark">Perfect table!</div><div class="fb-body">Solids keep their shape and volume. Liquids keep their volume only. Gases keep neither, and only gases can be compressed.${tried.size < 3 ? ' Try any tests you skipped to see these properties in action.' : ''}</div><button class="btn" id="doneBtn">See results</button>`;
+      $('#doneBtn').onclick = () => finish(st, firstCheck, 9);
+    } else {
+      fb.className = 'fb bad';
+      fb.innerHTML = `<div class="fb-mark">${correct} of 9 correct</div><div class="fb-body">Red boxes need another look. Replay Test 1 and Test 2 to check your ideas, then fix the table.</div>`;
+    }
+  };
+
+  function frame(now) {
+    const ink = cssVar('--ink'), muted = cssVar('--muted');
+    // Pour canvas
+    let ctx = setupCanvas(pourCv, 720, 310);
+    CONTAINERS.forEach((c, ci) => {
+      const t = mode ? Math.min(1, (now - t0) / (reduced ? 1 : 1400)) : 0;
+      const ease = 1 - Math.pow(1 - t, 3);
+      if (mode === 'liquid') {
+        const lv = c.level * ease;
+        ctx.save(); shapePath(ctx, c, lv); ctx.closePath();
+        ctx.globalAlpha = 0.45; ctx.fillStyle = cssVar('--liquid'); ctx.fill(); ctx.restore();
+        ctx.strokeStyle = cssVar('--liquid'); ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(c.cx - c.w(lv) / 2 + 2, BASE - lv); ctx.lineTo(c.cx + c.w(lv) / 2 - 2, BASE - lv); ctx.stroke();
+        if (t < 1) { ctx.fillStyle = cssVar('--liquid'); ctx.fillRect(c.cx - 3, 10, 6, BASE - lv - 10); }
+      }
+      if (mode === 'solid') {
+        const yTop = BASE - c.H - 30, yEnd = BASE - 26;
+        const y = yTop + (yEnd - yTop) * (t < 1 ? t * t : 1);
+        ctx.fillStyle = cssVar('--eraser');
+        ctx.beginPath(); ctx.roundRect ? ctx.roundRect(c.cx - 20, y, 40, 24, 5) : ctx.rect(c.cx - 20, y, 40, 24); ctx.fill();
+        ctx.fillStyle = cssVar('--card'); ctx.fillRect(c.cx + 4, y + 4, 12, 16);
+      }
+      if (mode === 'gas') {
+        ctx.fillStyle = cssVar('--gas');
+        const spd = reduced ? 0.35 : 1;
+        parts[ci].forEach(p => {
+          p.x += p.vx * spd; if (!insideC(c, p.x, p.y)) { p.x -= p.vx * spd; p.vx *= -1; }
+          p.y += p.vy * spd; if (!insideC(c, p.x, p.y)) { p.y -= p.vy * spd; p.vy *= -1; }
+          ctx.beginPath(); ctx.arc(p.x, p.y, 3.6, 0, Math.PI * 2); ctx.fill();
+        });
+      }
+      ctx.strokeStyle = ink; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+      shapePath(ctx, c, c.H); ctx.stroke();
+      if (mode === 'gas') {
+        ctx.lineWidth = 5; ctx.beginPath();
+        ctx.moveTo(c.cx - c.w(c.H) / 2 - 6, BASE - c.H); ctx.lineTo(c.cx + c.w(c.H) / 2 + 6, BASE - c.H); ctx.stroke();
+      }
+      ctx.textAlign = 'center';
+      ctx.fillStyle = muted; ctx.font = '600 15px "Atkinson Hyperlegible", system-ui, sans-serif';
+      ctx.fillText(c.name, c.cx, BASE + 24);
+      if (mode) {
+        ctx.fillStyle = ink; ctx.font = '700 15px "JetBrains Mono", ui-monospace, monospace';
+        ctx.fillText({ solid: 'same shape', liquid: 'volume 100 ml', gas: 'fills it all' }[mode], c.cx, BASE + 46);
+      }
+    });
+
+    // Syringe canvas
+    ctx = setupCanvas(syrCv, 720, 220);
+    const rows = [{ y: 66, kind: 'air', label: 'Air' }, { y: 160, kind: 'water', label: 'Water' }];
+    const X0 = 170, PX = 6, END = X0 + 60 * PX;
+    rows.forEach((r, ri) => {
+      const vol = r.kind === 'air' ? 50 - 30 * push / 100 : 50;
+      const seal = X0 + vol * PX;
+      const jitter = r.kind === 'water' && push > 0 && !reduced ? Math.sin(now / 30) * 1.5 : 0;
+      // contents
+      if (r.kind === 'air') {
+        ctx.fillStyle = cssVar('--gas');
+        for (let k = 0; k < 34; k++) {
+          const h1 = Math.sin(k * 12.9898) * 43758.5453, h2 = Math.sin(k * 78.233) * 12543.123;
+          const u = h1 - Math.floor(h1), v = h2 - Math.floor(h2);
+          const wob = reduced ? 0 : Math.sin(now / 260 + k) * 3;
+          ctx.beginPath(); ctx.arc(X0 + 6 + u * (seal - X0 - 12) + wob, r.y - 14 + v * 28 + Math.cos(now / 310 + k) * (reduced ? 0 : 2), 3.4, 0, Math.PI * 2); ctx.fill();
+        }
+      } else {
+        ctx.save(); ctx.globalAlpha = 0.45; ctx.fillStyle = cssVar('--liquid'); ctx.fillRect(X0, r.y - 20, seal - X0, 40); ctx.restore();
+      }
+      ctx.strokeStyle = ink; ctx.lineWidth = 2.5;
+      // barrel and tip
+      ctx.strokeRect(X0, r.y - 22, END - X0, 44);
+      ctx.strokeRect(X0 - 24, r.y - 7, 24, 14);
+      ctx.fillStyle = cssVar('--solid'); ctx.fillRect(X0 - 36, r.y - 11, 12, 22);
+      ctx.beginPath(); ctx.moveTo(END, r.y - 32); ctx.lineTo(END, r.y + 32); ctx.stroke();
+      // scale
+      ctx.fillStyle = muted; ctx.font = '600 11px "JetBrains Mono", ui-monospace, monospace'; ctx.textAlign = 'center';
+      for (let v = 0; v <= 60; v += 10) {
+        ctx.beginPath(); ctx.moveTo(X0 + v * PX, r.y - 22); ctx.lineTo(X0 + v * PX, r.y - 14); ctx.lineWidth = 1.5; ctx.stroke();
+        if (ri === 0 || v % 20 === 0) ctx.fillText(v, X0 + v * PX, r.y - 28);
+      }
+      // plunger
+      const px = seal + jitter;
+      ctx.fillStyle = ink; ctx.fillRect(px, r.y - 21, 9, 42);
+      ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(px + 9, r.y); ctx.lineTo(px + 150, r.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px + 150, r.y - 20); ctx.lineTo(px + 150, r.y + 20); ctx.stroke();
+      // labels
+      ctx.textAlign = 'left'; ctx.fillStyle = ink;
+      ctx.font = '600 17px "Fredoka", system-ui, sans-serif'; ctx.fillText(r.label, 10, r.y - 4);
+      ctx.font = '700 15px "JetBrains Mono", ui-monospace, monospace'; ctx.fillText(Math.round(vol) + ' ml', 10, r.y + 18);
+      if (r.kind === 'water' && push > 0) { ctx.fillStyle = cssVar('--bad'); ctx.font = '700 13px "Atkinson Hyperlegible", system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('won’t move!', 712, r.y + 40); }
+    });
+    anim = requestAnimationFrame(frame);
+  }
+  anim = requestAnimationFrame(frame);
+}
+
+/* ---------- Station 4: Measuring Lab ---------- */
+function cylinder(level, stone, label) {
+  const y = v => 290 - v * 2.6;
+  let ticks = '';
+  for (let v = 0; v <= 100; v += 2) {
+    const major = v % 10 === 0;
+    ticks += `<line x1="61" x2="${major ? 80 : 71}" y1="${y(v)}" y2="${y(v)}" class="tick${major ? ' major' : ''}"/>`;
+    if (major) ticks += `<text x="54" y="${y(v) + 3.5}" class="tlab">${v}</text>`;
+  }
+  const yl = y(level);
+  return `<div class="cyl-wrap"><svg class="cyl" viewBox="0 0 170 320" role="img" aria-label="${label ? label + ': ' : ''}measuring cylinder">
+    <path d="M61 ${yl - 5} Q95 ${yl + 5} 129 ${yl - 5} L129 289 L61 289 Z" class="d-water"/>
+    <path d="M61 ${yl - 5} Q95 ${yl + 5} 129 ${yl - 5}" class="d-surface"/>
+    ${stone ? `<path d="M80 289 L76 274 L86 262 L102 260 L114 268 L113 283 L104 289 Z" class="d-stone"/>` : ''}
+    ${ticks}
+    <path d="M60 22 V290 M130 22 V290 M60 22 L54 16 M130 22 L136 16" class="d-line"/>
+    <rect x="40" y="290" width="110" height="10" rx="3" class="d-line"/>
+    <text x="95" y="314" text-anchor="middle" class="d-lab">ml</text>
+  </svg>${label ? `<span>${label}</span>` : ''}</div>`;
+}
+function balance(reading, sand) {
+  return `<svg viewBox="0 0 200 170" width="190" role="img" aria-label="Electronic balance reading ${reading} grams">
+    ${sand ? `<path d="M81 70 Q100 62 119 70 V96 Q119 100 115 100 H85 Q81 100 81 96 Z" class="d-sand"/>` : ''}
+    <path d="M78 38 V96 Q78 103 85 103 H115 Q122 103 122 96 V38" class="d-line"/>
+    <rect x="50" y="104" width="100" height="8" rx="3" class="d-pan"/>
+    <rect x="20" y="114" width="160" height="50" rx="10" class="d-body"/>
+    <rect x="56" y="124" width="88" height="30" rx="4" class="d-screen"/>
+    <text x="137" y="145" text-anchor="end" class="d-read">${reading} g</text>
+  </svg>`;
+}
+function readQ() {
+  let lv; do { lv = randEven(12, 96); } while (lv % 10 === 0);
+  return numeric({
+    figure: cylinder(lv), unit: 'ml', answer: lv,
+    prompt: 'What is the volume of water in this measuring cylinder?',
+    tip: 'Each small mark stands for 2 ml. Read the bottom of the curved surface.',
+    explain: `Find the nearest labelled mark below the water, then count the small marks (2 ml each) up to the bottom of the meniscus: <b>${lv} ml</b>.`,
+  });
+}
+function dispQ() {
+  const before = randEven(30, 60), stone = randEven(6, 26), after = before + stone;
+  return numeric({
+    figure: cylinder(before, false, 'Before') + cylinder(after, true, 'After adding a stone'),
+    unit: 'cm³', answer: stone,
+    prompt: 'A stone is lowered into the water. What is the volume of the stone?',
+    tip: 'The stone pushes the water up by its own volume. 1 ml = 1 cm³.',
+    explain: `Volume of stone = ${after} ml − ${before} ml = <b>${stone} ml = ${stone} cm³</b>. This is called the displacement method.`,
+  });
+}
+function balQ() {
+  const beaker = rand(80, 150), sand = rand(25, 120);
+  return numeric({
+    figure: `<div class="cyl-wrap">${balance(beaker, false)}<span>Empty beaker</span></div><div class="cyl-wrap">${balance(beaker + sand, true)}<span>Beaker + sand</span></div>`,
+    unit: 'g', answer: sand,
+    prompt: 'What is the mass of the sand?',
+    explain: `Mass of sand = ${beaker + sand} g − ${beaker} g = <b>${sand} g</b>. Mass is measured in grams (g) or kilograms (kg).`,
+  });
+}
+function startS4() {
+  const st = STATIONS[3];
+  const qs = [
+    readQ(), readQ(),
+    mcq({ prompt: 'Where should your eye be when you read the water level in a measuring cylinder?', options: ['Level with the bottom of the meniscus', 'Above the water, looking down', 'Below the water, looking up', 'Anywhere, as long as the cylinder is full'], explain: 'Put the cylinder on a flat surface and bend down until your eye is level with the bottom of the curved surface (the meniscus).' }),
+    dispQ(), readQ(), balQ(), dispQ(),
+    mcq({ prompt: '1 ml of water has the same volume as…', options: ['1 cm³', '1 g', '10 cm³', '1 l'], explain: '1 ml = 1 cm³. Both are units of volume. 1 l = 1000 ml. Grams measure mass, not volume.' }),
+  ];
+  runQuiz(st, 'Mass is the amount of matter in an object. Volume is the amount of space it takes up. Use the instruments to measure both.', qs);
+}
+
+/* ---------- Station 5: Exam Challenge ---------- */
+function startS5() {
+  runQuiz(STATIONS[4], 'Ten exam-style questions. Read each experiment carefully before you answer.', shuffle(EXAM).slice(0, 10).map(mcq));
+}
+
+/* ---------- Notebook ---------- */
+function renderNotes() {
+  view.innerHTML = `<div class="station-head">
+      <div><button class="back" data-go="home">← Lab map</button></div>
+      <p class="eyebrow">Revision</p>
+      <h2>Science Notebook</h2>
+      <p class="intro">The key ideas for P4 Matter. Read these before you try a station again.</p>
+    </div>
+    <div class="notes-grid">
+      <section class="note">
+        <h3>What is matter?</h3>
+        <p class="def">Matter is anything that <b>has mass</b> and <b>occupies space</b>.</p>
+        <ul>
+          <li><b>Matter:</b> air, water, rocks, milk, steam, clouds, sand, your body.</li>
+          <li><b>Not matter:</b> light, sound, heat, electricity, shadows, rainbows, feelings, thoughts.</li>
+          <li>A torch is matter, but the light it gives out is not.</li>
+        </ul>
+      </section>
+      <section class="note">
+        <h3>Three states of matter</h3>
+        <div class="ptable-wrap"><table class="ntable">
+          <thead><tr><th></th><th>Definite shape</th><th>Definite volume</th><th>Can be compressed</th></tr></thead>
+          <tbody>
+            <tr><th scope="row" style="color:var(--solid)">Solid</th><td>Yes</td><td>Yes</td><td>No</td></tr>
+            <tr><th scope="row" style="color:var(--liquid)">Liquid</th><td>No</td><td>Yes</td><td>No</td></tr>
+            <tr><th scope="row" style="color:var(--gas)">Gas</th><td>No</td><td>No</td><td>Yes</td></tr>
+          </tbody>
+        </table></div>
+        <ul>
+          <li>A <b>liquid</b> takes the shape of its container.</li>
+          <li>A <b>gas</b> spreads out to fill the whole container, so its volume is the volume of the container.</li>
+          <li>A solid's shape changes only when a force is applied (pressing plasticine). Its mass and volume stay the same.</li>
+          <li>Sand and salt are solids: each grain has a definite shape and volume.</li>
+        </ul>
+      </section>
+      <section class="note">
+        <h3>Air is matter</h3>
+        <ul>
+          <li><b>Air has mass:</b> a football becomes heavier after air is pumped into it.</li>
+          <li><b>Air occupies space:</b> an upside-down cup pushed into water keeps a tissue inside it dry.</li>
+          <li><b>Air occupies space:</b> water stays in a funnel sealed into a flask with plasticine. Make a hole for the air to escape and the water flows in.</li>
+          <li><b>Air can be compressed:</b> the plunger of a sealed syringe of air can be pushed in. Its volume decreases but its mass stays the same.</li>
+        </ul>
+      </section>
+      <section class="note">
+        <h3>Measuring mass and volume</h3>
+        <ul>
+          <li><b>Mass</b> is the amount of matter. Measure it with an electronic balance in <span class="mono">g</span> or <span class="mono">kg</span>. 1 kg = 1000 g.</li>
+          <li><b>Volume</b> is the amount of space taken up. Measure liquids with a measuring cylinder in <span class="mono">ml</span>, <span class="mono">l</span> or <span class="mono">cm³</span>. 1 ml = 1 cm³ and 1 l = 1000 ml.</li>
+          <li>Read the cylinder at <b>eye level</b>, at the <b>bottom of the meniscus</b>.</li>
+          <li><b>Displacement:</b> volume of an object = water level after − water level before.</li>
+        </ul>
+      </section>
+    </div>`;
+}
+
+/* ---------- Boot ---------- */
+window.claude?.hot?.snapshot?.(() => ({ state }));
+const start = data => {
+  if (data && data.state) state = { ...state, ...data.state }; else load();
+  renderHeader();
+  go('home');
+};
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+</body>
+</html>
