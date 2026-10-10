@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sunbeam Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Lexend:wght@400;600;700&family=DM+Mono:wght@500&display=swap">
+<style>
+/* Layout: a shadow-puppet stage lit by a sunbeam from the top-left. Header strip, hero with a live mini shadow theatre + rank card, then a grid of six lab stations; each station opens as its own view. */
+:root{
+  --bg:#F3F2F8; --glow:#FFE8A8; --card:#FFFFFF; --ink:#1E1B3A; --muted:#5C5878; --line:#DCD9EA;
+  --sun:#FFB000; --sun-soft:#FFE29A; --accent:#5B3FD6; --star:#F2A900;
+  --room:#2B2748; --beam:#FFF1B8; --screen:#FFF7DC; --shade:#1E1B3A;
+  --sky:#DCEBFF; --ground:#CFE4B4;
+  --transparent:#1E9FB0; --translucent:#8A6DE8; --opaque:#8B5E3C;
+  --metal:#61739A; --wood:#B07A35; --hot:#E5484D; --cold:#2F7FE0;
+  --good:#1B8F52; --good-bg:#E3F5EA; --bad:#CC3F37; --bad-bg:#FCE8E6;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Lexend",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"DM Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#110F22; --glow:#2E2712; --card:#1B1833; --ink:#ECEAF7; --muted:#A6A2C4; --line:#312D52;
+    --sun:#FFC233; --sun-soft:#5A4610; --accent:#A996FF; --star:#FFC933;
+    --room:#0A0916; --beam:#6B5A1E; --screen:#F3E7BC; --shade:#141127;
+    --sky:#1C2347; --ground:#21402B;
+    --transparent:#4CC9D8; --translucent:#B19DFF; --opaque:#C48A5E;
+    --metal:#9AACD3; --wood:#D9A15A; --hot:#FF6B6F; --cold:#5EA3F5;
+    --good:#4CCB86; --good-bg:#12301F; --bad:#FF7A70; --bad-bg:#3A1716;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#110F22; --glow:#2E2712; --card:#1B1833; --ink:#ECEAF7; --muted:#A6A2C4; --line:#312D52;
+  --sun:#FFC233; --sun-soft:#5A4610; --accent:#A996FF; --star:#FFC933;
+  --room:#0A0916; --beam:#6B5A1E; --screen:#F3E7BC; --shade:#141127;
+  --sky:#1C2347; --ground:#21402B;
+  --transparent:#4CC9D8; --translucent:#B19DFF; --opaque:#C48A5E;
+  --metal:#9AACD3; --wood:#D9A15A; --hot:#FF6B6F; --cold:#5EA3F5;
+  --good:#4CCB86; --good-bg:#12301F; --bad:#FF7A70; --bad-bg:#3A1716;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  margin:0; color:var(--ink); background-color:var(--bg);
+  background-image:radial-gradient(900px 520px at 0% -8%,var(--glow),transparent 70%);
+  background-repeat:no-repeat;
+  font:16.5px/1.6 var(--body);
+}
+.app{max-width:1060px; margin:0 auto; padding-inline:16px; padding-block:18px 56px}
+h1,h2,h3{font-family:var(--display); font-weight:800; line-height:1.08; text-wrap:balance; margin:0}
+p{margin:0}
+button,input{font:inherit; color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.mono{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+.eyebrow{font-size:.76rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+.beam{background:linear-gradient(transparent 52%,var(--sun-soft) 52%,var(--sun-soft) 90%,transparent 90%); padding-inline:.06em}
+
+/* Header */
+.top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 20px; margin-bottom:26px}
+.brand{display:flex; align-items:center; gap:12px; background:none; border:0; padding:0; cursor:pointer; text-align:left}
+.brand svg{width:44px; height:44px; flex:none}
+.brand-name{font-family:var(--display); font-weight:800; font-size:1.85rem; line-height:1}
+.brand-sub{display:block; font-size:.8rem; color:var(--muted); margin-top:4px}
+.stats{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.pill{display:inline-flex; align-items:center; gap:6px; padding:6px 13px; border-radius:999px; background:var(--card); border:1.5px solid var(--line); font-size:.88rem; font-weight:600}
+.pill .star{width:16px; height:16px}
+.icon-btn{cursor:pointer}
+
+/* Buttons */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:10px 20px; border-radius:999px; border:2px solid var(--ink); background:var(--ink); color:var(--bg); font-weight:700; cursor:pointer; transition:transform .12s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn.sun{background:var(--sun); border-color:var(--sun); color:#2A1E00}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.45; cursor:not-allowed; transform:none}
+.back{background:none; border:0; padding:6px 0; color:var(--muted); font-weight:600; cursor:pointer}
+.back:hover{color:var(--ink)}
+
+.stars{display:inline-flex; gap:2px}
+.star{width:22px; height:22px; fill:var(--line)}
+.star.on{fill:var(--star)}
+
+/* Home */
+.hero{display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:22px; align-items:stretch; margin-bottom:30px}
+.hero-main{display:flex; flex-direction:column; gap:14px; min-width:0}
+.hero h1{font-size:clamp(2.1rem,5.4vw,3.4rem)}
+.lede{max-width:54ch; color:var(--muted); font-size:1.05rem}
+.lede b{color:var(--ink)}
+.stage{background:var(--room); border-radius:var(--r); padding:14px; display:flex; flex-direction:column; gap:10px; min-width:0}
+.stage svg{width:100%; height:auto; display:block}
+.stage label{color:#F3F0FF; font-size:.88rem; font-weight:600; display:flex; align-items:center; gap:12px}
+.stage input{flex:1; accent-color:var(--sun); min-width:0}
+.side{display:flex; flex-direction:column; gap:16px; min-width:0}
+.rank{background:var(--card); border:1.5px solid var(--line); border-radius:var(--r); padding:18px 20px}
+.rank-name{font-family:var(--display); font-size:1.65rem; font-weight:800; margin-block:2px 10px}
+.meter{height:14px; border-radius:999px; background:var(--bg); border:1.5px solid var(--line); overflow:hidden}
+.meter i{display:block; height:100%; background:var(--sun); border-radius:999px; transition:width .5s ease}
+.rank-foot{display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px 10px; margin-top:8px; font-size:.86rem; color:var(--muted)}
+.strands{display:flex; gap:10px; flex-wrap:wrap}
+.strand{flex:1 1 140px; padding:12px 14px; border-radius:12px; border:1.5px dashed var(--line); font-size:.88rem; color:var(--muted)}
+.strand b{display:block; font-family:var(--display); font-size:1.15rem; color:var(--ink)}
+.section-label{margin-block:30px 12px}
+.stations{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr)); gap:16px}
+.st{display:flex; flex-direction:column; gap:8px; background:var(--card); border:1.5px solid var(--line); border-radius:var(--r); padding:18px 18px 18px 22px; position:relative; overflow:hidden}
+.st::before{content:""; position:absolute; inset:0 auto 0 0; width:7px; background:var(--tone)}
+.st-top{display:flex; justify-content:space-between; align-items:center; gap:8px}
+.st-num{font-family:var(--mono); font-size:.78rem; color:var(--tone); font-weight:500}
+.st h3{font-size:1.45rem}
+.st p{color:var(--muted); font-size:.94rem; flex:1}
+.st .btn{align-self:flex-start; margin-top:4px}
+.st.notes{background:transparent; border:2px dashed var(--line)}
+.st.notes::before{display:none}
+
+/* Station views */
+.station-head{display:flex; flex-direction:column; gap:6px; margin-bottom:18px}
+.station-head h2{font-size:clamp(2rem,4.8vw,2.7rem)}
+.intro{color:var(--muted); max-width:62ch}
+.progress{display:flex; align-items:center; gap:12px; margin-bottom:14px}
+.progress .bar{flex:1; height:10px; border-radius:999px; background:var(--card); border:1.5px solid var(--line); overflow:hidden}
+.progress .bar i{display:block; height:100%; width:0; background:var(--sun); transition:width .3s ease}
+.qbox{background:var(--card); border:1.5px solid var(--line); border-radius:var(--r); padding:22px; box-shadow:0 10px 30px -18px var(--shade)}
+.prompt{font-size:1.12rem; font-weight:600; margin-bottom:16px; max-width:64ch}
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:10px}
+.opt{display:flex; align-items:center; gap:12px; text-align:left; padding:12px 14px; min-height:54px; border-radius:12px; border:2px solid var(--line); background:var(--bg); cursor:pointer; transition:border-color .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--ink); transform:translateY(-1px)}
+.opt:disabled{cursor:default}
+.opt-key{flex:none; width:30px; height:30px; display:grid; place-items:center; border-radius:50%; background:var(--card); border:1.5px solid var(--line); font-family:var(--mono); font-size:.85rem}
+.opt.correct{border-color:var(--good); background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad); background:var(--bad-bg)}
+.opt.big{justify-content:center; text-align:center; font-family:var(--display); font-size:1.25rem; font-weight:700; min-height:72px}
+.fig{margin:0 0 16px; display:flex; flex-wrap:wrap; gap:18px; align-items:flex-end}
+.fig svg{max-width:100%; height:auto}
+.fb{margin-top:16px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 18px; align-items:center; padding:16px 18px; border-radius:var(--r); border:2px solid; animation:pop .25s ease}
+.fb.good{border-color:var(--good); background:var(--good-bg)}
+.fb.bad{border-color:var(--bad); background:var(--bad-bg)}
+.fb.info{border-color:var(--line); background:var(--card)}
+.fb-mark{font-family:var(--display); font-weight:800; font-size:1.3rem}
+.fb.good .fb-mark{color:var(--good)} .fb.bad .fb-mark{color:var(--bad)}
+.fb-body{grid-column:1; min-width:0}
+.fb .btn{grid-column:2; grid-row:1 / span 2}
+@media (max-width:560px){ .fb{grid-template-columns:minmax(0,1fr)} .fb .btn{grid-column:1; grid-row:auto; justify-self:start} }
+@keyframes pop{from{transform:scale(.97); opacity:.4}to{transform:none; opacity:1}}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.shake{animation:shake .35s ease}
+
+/* Specimen card (station 1) */
+.specimen{display:flex; flex-direction:column; align-items:center; gap:4px; padding:18px; margin-bottom:16px; border-radius:12px; background:var(--bg); border:2px dashed var(--line)}
+.spec-icon{font-size:4rem; line-height:1.15}
+.spec-name{font-family:var(--display); font-size:1.7rem; font-weight:800; text-align:center}
+.spec-note{font-size:.9rem; color:var(--muted); text-align:center}
+
+/* Sorting boards */
+.howto{margin-bottom:12px; font-weight:600}
+.bins{display:grid; grid-template-columns:repeat(var(--cols,3),minmax(0,1fr)); gap:12px; margin-bottom:16px}
+.bin{display:flex; flex-direction:column; gap:4px; text-align:left; padding:14px; min-height:160px; border-radius:var(--r); border:2.5px solid var(--c); background:var(--card); cursor:pointer; transition:transform .12s}
+.bin:hover{transform:translateY(-2px)}
+.bin.armed{box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 28%,transparent)}
+.bin-name{font-family:var(--display); font-size:1.35rem; font-weight:800; color:var(--c)}
+.bin-hint{font-size:.85rem; color:var(--muted)}
+.bin-items{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+.placed{font-size:.8rem; padding:3px 9px; border-radius:999px; background:color-mix(in srgb,var(--c) 14%,var(--card)); border:1px solid var(--c)}
+.tray{display:flex; flex-wrap:wrap; gap:10px; min-height:60px; padding:14px; border-radius:var(--r); border:2px dashed var(--line); background:var(--card)}
+.chip{display:inline-flex; align-items:center; gap:8px; padding:9px 15px; border-radius:999px; border:2px solid var(--line); background:var(--bg); font-weight:600; cursor:pointer}
+.chip span{font-size:1.3rem; line-height:1}
+.chip.sel{border-color:var(--accent); background:var(--card); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 28%,transparent)}
+@media (max-width:640px){ .bins{grid-template-columns:minmax(0,1fr)} .bin{min-height:0} }
+
+/* Lab blocks, canvases, controls */
+.lab-block{background:var(--card); border:1.5px solid var(--line); border-radius:var(--r); padding:18px; margin-bottom:18px}
+.lab-block h3{font-size:1.4rem; margin-bottom:4px}
+.lab-block > p{color:var(--muted); margin-bottom:12px}
+canvas{display:block; width:100%; height:auto; border-radius:12px; border:1.5px solid var(--line)}
+.controls{display:flex; flex-wrap:wrap; gap:12px 18px; align-items:center; margin-top:14px}
+.ctrl{display:flex; flex-direction:column; gap:4px; flex:1 1 240px; min-width:0}
+.ctrl label{font-weight:600; font-size:.92rem}
+.ctrl input[type=range]{width:100%; accent-color:var(--accent)}
+.seg{display:flex; flex-wrap:wrap; gap:8px}
+.seg button{padding:8px 14px; border-radius:999px; border:2px solid var(--line); background:var(--bg); font-weight:600; font-size:.92rem; cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--c,var(--ink)); background:color-mix(in srgb,var(--c,var(--ink)) 16%,var(--card))}
+.caption{margin-top:12px; padding:10px 14px; border-radius:10px; background:var(--bg); border-left:5px solid var(--c,var(--line))}
+.tip{font-size:.9rem; color:var(--muted); margin-top:10px}
+.tip.warn{color:var(--bad); font-weight:600}
+
+/* Heat flow cards */
+.flow{display:grid; grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr); gap:10px; align-items:center; margin-bottom:16px}
+.obj{display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 10px; border-radius:14px; background:var(--bg); border:1.5px solid var(--line); text-align:center}
+.obj-icon{font-size:2.6rem; line-height:1.1}
+.obj-name{font-weight:600; font-size:.95rem}
+.obj-t{font-size:1.5rem}
+.mini{width:18px; height:90px; border-radius:9px; border:2px solid var(--ink); background:var(--card); position:relative; overflow:hidden}
+.mini i{position:absolute; left:0; right:0; bottom:0; border-radius:0 0 7px 7px}
+.flow-mid{display:grid; place-items:center}
+.flow-mid svg{width:80px; height:40px; overflow:visible}
+.arrow-path{fill:none; stroke:var(--hot); stroke-width:5; stroke-linecap:round; stroke-linejoin:round}
+.flow-mid svg.rev{transform:scaleX(-1)}
+@media (max-width:480px){ .flow{grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr)} .flow-mid svg{width:50px} .obj-t{font-size:1.2rem} }
+
+/* Numeric answers */
+.numform{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.numform input{width:140px; min-height:48px; padding:8px 12px; font:500 1.2rem var(--mono); border-radius:10px; border:2px solid var(--line); background:var(--bg); color:var(--ink)}
+.numform.correct input{border-color:var(--good); background:var(--good-bg)}
+.numform.wrong input{border-color:var(--bad); background:var(--bad-bg)}
+.unit{font-weight:700; color:var(--muted)}
+.thermo{width:150px}
+
+/* SVG diagram classes */
+.d-line{fill:none; stroke:var(--ink); stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round}
+.d-thin{fill:none; stroke:var(--muted); stroke-width:1.2}
+.d-ink{fill:var(--ink)}
+.d-card{fill:var(--card)}
+.d-sun{fill:var(--sun)}
+.d-beam{fill:var(--sun); fill-opacity:.22}
+.d-shade{fill:var(--ink); fill-opacity:.8}
+.d-hot{fill:var(--hot)}
+.d-hotline{stroke:var(--hot); stroke-width:6; stroke-linecap:round}
+.d-lab{fill:var(--muted); font:500 12px var(--body)}
+.d-ground{fill:var(--ground)}
+.tick{stroke:var(--ink); stroke-width:1}
+.tick.major{stroke-width:1.6}
+.tlab{fill:var(--ink); font:500 10px var(--mono); text-anchor:end}
+.dtable{border-collapse:collapse; min-width:280px}
+.dtable th,.dtable td{padding:8px 14px; border:1.5px solid var(--line); text-align:center}
+.dtable th{font-size:.85rem; color:var(--muted)}
+
+/* Results */
+.results{text-align:center; background:var(--card); border:1.5px solid var(--line); border-radius:var(--r); padding:30px 20px}
+.results .stars .star{width:58px; height:58px}
+.results h2{font-size:2.1rem; margin-block:12px 4px}
+.results .score{font-family:var(--mono); font-size:1.1rem}
+.results .msg{color:var(--muted); margin:8px auto 20px; max-width:46ch}
+.row{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+
+/* Notebook */
+.notes-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,430px),1fr)); gap:16px}
+.note{background:var(--card); border:1.5px solid var(--line); border-radius:var(--r); padding:20px; min-width:0}
+.note h3{font-size:1.4rem; margin-bottom:10px}
+.note li{max-width:65ch}
+.note ul{margin:8px 0 0; padding-left:20px; display:grid; gap:6px}
+.def{padding:12px 14px; border-radius:10px; background:var(--bg); border-left:5px solid var(--sun); margin-bottom:10px}
+.wrap-x{overflow-x:auto}
+.ntable{border-collapse:collapse; width:100%; min-width:380px; font-size:.93rem}
+.ntable th,.ntable td{padding:8px 10px; border-bottom:1.5px solid var(--line); text-align:left; vertical-align:top}
+.ntable thead th{font-size:.76rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.ntable tbody th{font-family:var(--display); font-weight:800; font-size:1.05rem}
+
+@media (max-width:820px){ .hero{grid-template-columns:minmax(0,1fr)} }
+@media (prefers-reduced-motion: reduce){ *,*::before,*::after{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <button class="brand" data-go="home" aria-label="Sunbeam Lab home">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="17" cy="17" r="8" fill="var(--sun)"/>
+        <g stroke="var(--sun)" stroke-width="3" stroke-linecap="round"><path d="M17 3v3M17 28v3M3 17h3M28 17h3M7 7l2 2M25 25l2 2M7 27l2-2M25 9l2-2"/></g>
+        <path d="M24 44 L30 30 L44 30 L44 44 Z" fill="var(--ink)" opacity=".85"/>
+        <rect x="33" y="16" width="5" height="14" rx="1" fill="var(--ink)"/>
+      </svg>
+      <span><span class="brand-name">Sunbeam Lab</span><span class="brand-sub">Primary 4 Science · Light, Shadows and Heat</span></span>
+    </button>
+    <div class="stats" id="stats"></div>
+  </header>
+  <main id="view" aria-live="polite"></main>
+</div>
+
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const view = $('#view');
+const STORE = 'sunbeam-lab-v1';
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let state = { best: {}, xp: 0, sound: true };
+function load() { try { const s = JSON.parse(localStorage.getItem(STORE)); if (s) state = { ...state, ...s }; } catch (e) {} }
+function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const rand = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+const randEven = (lo, hi) => 2 * rand(Math.ceil(lo / 2), Math.floor(hi / 2));
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const ease3 = t => 1 - Math.pow(1 - t, 3);
+
+/* ---------- Sound ---------- */
+let actx;
+function sfx(kind) {
+  if (!state.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const notes = kind === 'good' ? [587, 880] : kind === 'bad' ? [247, 208] : [440, 554, 659, 880];
+    notes.forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = kind === 'bad' ? 'square' : 'sine';
+      o.frequency.value = f;
+      const t = actx.currentTime + i * 0.1, peak = kind === 'bad' ? 0.045 : 0.14;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+      o.connect(g).connect(actx.destination);
+      o.start(t); o.stop(t + 0.24);
+    });
+  } catch (e) {}
+}
+
+/* ---------- Stars, ranks, header ---------- */
+const STAR = on => `<svg viewBox="0 0 24 24" class="star${on ? ' on' : ''}" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>`;
+const starRow = n => `<span class="stars" role="img" aria-label="${n} of 3 stars">${[0, 1, 2].map(k => STAR(k < n)).join('')}</span>`;
+const MAX_STARS = 18;
+const RANKS = [[0, 'Spark'], [5, 'Torch Bearer'], [10, 'Shadow Scientist'], [15, 'Heat Expert'], [18, 'Sunbeam Master']];
+const totalStars = () => Object.values(state.best).reduce((a, b) => a + b, 0);
+function rankInfo() {
+  const s = totalStars();
+  let i = 0; RANKS.forEach((r, k) => { if (s >= r[0]) i = k; });
+  return { stars: s, name: RANKS[i][1], next: RANKS[i + 1] };
+}
+function renderHeader() {
+  const r = rankInfo();
+  $('#stats').innerHTML = `
+    <span class="pill" title="Stars earned">${STAR(true)}<span class="mono">${r.stars}/${MAX_STARS}</span></span>
+    <span class="pill" title="Experience points"><span class="mono">${state.xp} XP</span></span>
+    <button class="pill icon-btn" id="soundBtn" aria-pressed="${state.sound}">${state.sound ? 'Sound on' : 'Sound off'}</button>`;
+  $('#soundBtn').onclick = () => { state.sound = !state.sound; save(); renderHeader(); if (state.sound) sfx('good'); };
+}
+
+/* ---------- Shapes (for shadows) ---------- */
+const SHAPES = {
+  cat: { w: 0.84, pts: [[-0.32, 0.5], [-0.32, -0.18], [-0.42, -0.5], [-0.14, -0.3], [0.14, -0.3], [0.42, -0.5], [0.32, -0.18], [0.32, 0.5]] },
+  star: { w: 0.95, pts: Array.from({ length: 10 }, (_, k) => { const r = k % 2 ? 0.21 : 0.5, a = -Math.PI / 2 + k * Math.PI / 5; return [r * Math.cos(a), r * Math.sin(a) + 0.05]; }) },
+  circle: { w: 1, circle: true },
+  rabbit: { w: 0.7, pts: [[-0.3, 0.5], [-0.3, 0.02], [-0.22, -0.08], [-0.26, -0.5], [-0.1, -0.5], [-0.06, -0.12], [0.06, -0.12], [0.1, -0.5], [0.26, -0.5], [0.22, -0.08], [0.3, 0.02], [0.3, 0.5]] },
+};
+function shapePath(ctx, name, cx, cy, h) {
+  const s = SHAPES[name];
+  ctx.beginPath();
+  if (s.circle) { ctx.arc(cx, cy, h / 2, 0, Math.PI * 2); return; }
+  s.pts.forEach(([x, y], k) => k ? ctx.lineTo(cx + x * h, cy + y * h) : ctx.moveTo(cx + x * h, cy + y * h));
+  ctx.closePath();
+}
+function shapeSvg(name, cx, cy, h) {
+  const s = SHAPES[name];
+  if (s.circle) return `<circle cx="${cx}" cy="${cy}" r="${h / 2}"/>`;
+  return `<path d="M${s.pts.map(([x, y]) => `${(cx + x * h).toFixed(1)} ${(cy + y * h).toFixed(1)}`).join(' L')} Z"/>`;
+}
+
+/* ---------- Content ---------- */
+const LIGHT_ITEMS = [
+  { name: 'The Sun', icon: '☀️', src: true, why: 'The Sun gives off its own light. It is our main source of light.' },
+  { name: 'Stars at night', icon: '⭐', src: true, why: 'Stars are like our Sun. They give off their own light.' },
+  { name: 'A lit candle', icon: '🕯️', src: true, why: 'The burning flame gives off its own light.' },
+  { name: 'A glowing firefly', icon: '✨', src: true, why: 'A firefly makes its own light with its body.' },
+  { name: 'A switched-on torch', icon: '🔦', src: true, why: 'A torch that is switched on gives off its own light.' },
+  { name: 'Lightning', icon: '⚡', src: true, why: 'Lightning gives off its own very bright light.' },
+  { name: 'A campfire', icon: '🔥', src: true, why: 'Fire gives off its own light (and heat).' },
+  { name: 'A switched-on TV', icon: '📺', src: true, why: 'A TV screen that is on gives off its own light.' },
+  { name: 'The Moon', icon: '🌙', src: false, why: 'The Moon does not give off its own light. It reflects light from the Sun.' },
+  { name: 'A mirror', icon: '🪞', src: false, why: 'A mirror only reflects light. In a dark room, you cannot see it.' },
+  { name: 'A diamond', icon: '💎', src: false, why: 'A diamond sparkles because it reflects light. It does not make its own.' },
+  { name: 'A bicycle reflector', icon: '🚲', src: false, why: 'A reflector shines only when light from car headlights falls on it and is reflected.' },
+  { name: 'A cat’s eyes at night', icon: '🐱', src: false, why: 'A cat’s eyes seem to glow because they reflect light. They do not make light.' },
+  { name: 'Aluminium foil', icon: '🥡', src: false, why: 'Shiny foil reflects light well, but it does not give off its own light.' },
+  { name: 'A switched-off torch', icon: '🔦', src: false, why: 'When it is switched off, the torch gives off no light. It is not a light source now.' },
+  { name: 'A shiny spoon', icon: '🥄', src: false, why: 'A shiny spoon reflects light. It does not give off its own light.' },
+];
+
+const SEE_ITEMS = {
+  transparent: [
+    { name: 'Clear glass window', icon: '🪟', why: 'Clear glass lets most light through. You can see clearly through it.' },
+    { name: 'Spectacle lens', icon: '👓', why: 'Spectacle lenses are transparent, so we can see clearly through them.' },
+    { name: 'Clear plastic sheet', icon: '📄', why: 'Clear plastic lets most light pass through. It is transparent.' },
+    { name: 'Cling wrap', icon: '🥪', why: 'Cling wrap lets most light through. You can see the food inside.' },
+    { name: 'Clear drinking glass', icon: '🥃', why: 'A clear glass is transparent. Most light passes through it.' },
+  ],
+  translucent: [
+    { name: 'Frosted glass', icon: '🚿', why: 'Frosted glass lets some light through, but you cannot see clearly through it.' },
+    { name: 'Tracing paper', icon: '📝', why: 'Tracing paper lets some light through. It is translucent.' },
+    { name: 'Tissue paper', icon: '🧻', why: 'Thin tissue paper lets some light through. It is translucent.' },
+    { name: 'Wax paper', icon: '🧁', why: 'Wax paper lets some light through but things behind it look blurry.' },
+    { name: 'Oily paper', icon: '🍟', why: 'An oil stain makes paper let some light through. It becomes translucent.' },
+  ],
+  opaque: [
+    { name: 'Wooden door', icon: '🚪', why: 'Wood does not let light pass through. It is opaque.' },
+    { name: 'Cardboard box', icon: '📦', why: 'Cardboard does not let light through. It is opaque.' },
+    { name: 'Brick wall', icon: '🧱', why: 'Bricks do not let any light through. They are opaque.' },
+    { name: 'Thick book', icon: '📕', why: 'A thick book blocks all light. It is opaque.' },
+    { name: 'Ceramic mug', icon: '☕', why: 'A ceramic mug does not let light through. It is opaque.' },
+    { name: 'Metal tray', icon: '🍽️', why: 'Metal does not let light pass through. It is opaque.' },
+  ],
+};
+
+const COND_ITEMS = {
+  good: [
+    { name: 'Steel spoon', icon: '🥄', why: 'Steel is a metal. Metals are good conductors of heat.' },
+    { name: 'Copper pot base', icon: '🍲', why: 'Copper is a metal that conducts heat very well, so food cooks quickly.' },
+    { name: 'Aluminium tray', icon: '🍽️', why: 'Aluminium is a metal. Heat travels through it quickly.' },
+    { name: 'Iron nail', icon: '🔩', why: 'Iron is a metal and a good conductor of heat.' },
+    { name: 'Brass key', icon: '🔑', why: 'Brass is a metal. Metals are good conductors of heat.' },
+    { name: 'Silver ring', icon: '💍', why: 'Silver is a metal and one of the best conductors of heat.' },
+  ],
+  poor: [
+    { name: 'Wooden spatula', icon: '🪵', why: 'Wood is a poor conductor of heat, so the handle stays cool.' },
+    { name: 'Plastic pot handle', icon: '🍳', why: 'Plastic is a poor conductor of heat, so you can hold the handle safely.' },
+    { name: 'Rubber glove', icon: '🧤', why: 'Rubber is a poor conductor of heat.' },
+    { name: 'Styrofoam box', icon: '📦', why: 'Styrofoam is a poor conductor of heat. It keeps cold food cold for longer.' },
+    { name: 'Wool scarf', icon: '🧣', why: 'Wool and the air trapped in it are poor conductors, so they slow down heat loss from your body.' },
+    { name: 'Air', icon: '🌬️', why: 'Air is a poor conductor of heat. Trapped air helps to keep things warm or cold.' },
+    { name: 'Cork mat', icon: '🟫', why: 'Cork is a poor conductor of heat, so it protects the table from a hot pot.' },
+  ],
+};
+
+const DIAGRAMS = {
+  torch: `<svg viewBox="0 0 330 150" width="330" role="img" aria-label="A torch shining on a toy in front of a screen">
+    <path d="M58 75 L300 18 L300 132 Z" class="d-beam"/>
+    <rect x="14" y="62" width="34" height="26" rx="5" class="d-line"/><path d="M48 58 L60 52 V98 L48 92 Z" class="d-line"/>
+    <rect x="150" y="56" width="10" height="38" rx="2" class="d-ink"/>
+    <path d="M300 10 V140" class="d-line" style="stroke-width:4"/>
+    <path d="M300 48 V102" class="d-shade" style="stroke:var(--ink); stroke-width:6; opacity:.6"/>
+    <text x="14" y="112" class="d-lab">torch</text><text x="140" y="112" class="d-lab">toy</text><text x="282" y="150" class="d-lab">screen</text>
+  </svg>`,
+  sunPole: `<svg viewBox="0 0 330 160" width="330" role="img" aria-label="The morning Sun low in the east, with a pole standing on the ground">
+    <rect x="0" y="120" width="330" height="40" class="d-ground"/>
+    <circle cx="290" cy="60" r="18" class="d-sun"/>
+    <rect x="160" y="50" width="7" height="70" class="d-ink"/>
+    <text x="10" y="148" class="d-lab">WEST</text><text x="282" y="148" class="d-lab">EAST</text>
+    <text x="258" y="30" class="d-lab">morning Sun</text>
+  </svg>`,
+  meter: `<table class="dtable"><thead><tr><th>Sheet</th><th>Light sensor reading</th></tr></thead>
+    <tbody><tr><td>P</td><td class="mono">0</td></tr><tr><td>Q</td><td class="mono">420</td></tr><tr><td>R</td><td class="mono">910</td></tr></tbody></table>`,
+};
+
+// Answer is always options[0]; options are shuffled when shown.
+const EXAM = [
+  { prompt: 'Why can we see a book lying on a table?', options: ['Light from a light source is reflected by the book into our eyes', 'Our eyes give out light that falls on the book', 'The book gives off its own light', 'The table reflects light onto our eyes'], explain: 'We see an object when light from it enters our eyes. A book is not a light source, so it must reflect light into our eyes.' },
+  { prompt: 'Which one of these is a light source?', options: ['A glowing firefly', 'The Moon', 'A mirror', 'A diamond ring'], explain: 'A light source gives off its own light. The Moon, mirrors and diamonds only reflect light.' },
+  { prompt: 'Why is the Moon <u>not</u> a light source?', options: ['It only reflects light from the Sun', 'It is too far away', 'It only shines at night', 'It is smaller than the Sun'], explain: 'The Moon does not give off its own light. We see it because it reflects sunlight.' },
+  { prompt: 'Ali is in a totally dark room with a red ball. He cannot see the ball. Why?', options: ['No light is reflected from the ball into his eyes', 'The ball is red', 'His eyes need time to give out light', 'The ball absorbs sound'], explain: 'There is no light to be reflected by the ball, so no light from the ball enters his eyes.' },
+  { prompt: 'Which material is translucent?', options: ['Tracing paper', 'Clear glass', 'Cardboard', 'Aluminium foil'], explain: 'Translucent materials let some light through. Clear glass is transparent; cardboard and foil are opaque.' },
+  { figure: DIAGRAMS.meter, prompt: 'Sheets P, Q and R were placed one at a time between a torch and a light sensor. Which sheet is best for a bathroom window that lets in light but stops people from seeing in?', options: ['Q', 'P', 'R', 'None of them'], explain: 'Q lets some light through, so it is translucent. P is opaque (no light) and R is transparent (people can see in).' },
+  { prompt: 'A shadow is formed when…', options: ['an object blocks light', 'light passes through a transparent object', 'an object gives off light', 'light bends around an object'], explain: 'Light travels in straight lines. When an object blocks the light, a dark area called a shadow forms behind it.' },
+  { figure: DIAGRAMS.torch, prompt: 'Ravi moves the toy closer to the torch. The torch and screen do not move. What happens to the shadow on the screen?', options: ['It becomes bigger', 'It becomes smaller', 'It stays the same size', 'It disappears'], explain: 'The closer the object is to the light source, the more light it blocks, so the shadow becomes bigger.' },
+  { figure: DIAGRAMS.torch, prompt: 'This time Ravi moves the toy closer to the <u>screen</u>. What happens to the shadow?', options: ['It becomes smaller', 'It becomes bigger', 'It becomes lighter in colour', 'It turns upside down'], explain: 'Moving the toy away from the torch (towards the screen) makes it block less light, so the shadow gets smaller.' },
+  { prompt: 'Which object would cast the darkest shadow?', options: ['A wooden block', 'A sheet of frosted glass', 'A clear glass plate', 'A piece of tracing paper'], explain: 'Opaque objects like wood block all light, so they cast the darkest shadows.' },
+  { prompt: 'At about what time of the day is your shadow the shortest?', options: ['Around noon', 'Early morning', 'Late afternoon', 'Just before sunset'], explain: 'Around noon the Sun is high up in the sky, so shadows are shortest. In the morning and evening the Sun is low and shadows are long.' },
+  { figure: DIAGRAMS.sunPole, prompt: 'In the morning, the Sun is in the east. In which direction does the shadow of the pole point?', options: ['West', 'East', 'North', 'Straight up'], explain: 'A shadow forms on the side away from the light. With the Sun in the east, the shadow points west.' },
+  { prompt: 'Which observation shows that light travels in straight lines?', options: ['Shadows have the same outline as the object', 'Mirrors are shiny', 'The Sun is hot', 'Light can pass through clear glass'], explain: 'Because light travels in straight lines, the edges of the light are blocked neatly, so a shadow has the outline of the object.' },
+  { prompt: 'Mary shines a torch on an ice-cream cone (a cone shape), holding it in different ways. Which shadows can she make?', options: ['A circle or a triangle', 'Only a triangle', 'Only a circle', 'A square'], explain: 'The shape of a shadow depends on which side of the object faces the light. A cone can give a circle (end on) or a triangle (side on).' },
+  { prompt: 'What colour is the shadow of a red plastic (opaque) toy?', options: ['Dark, not red', 'Red', 'Pink', 'Whatever colour the screen is'], explain: 'A shadow is an area without light, so it is dark. It does not take the colour of the object.' },
+  { prompt: 'Heat always flows from…', options: ['a hotter object to a colder object', 'a colder object to a hotter object', 'a bigger object to a smaller object', 'a metal object to a non-metal object'], explain: 'Heat flows from a hotter place or object to a colder one, until both are at the same temperature.' },
+  { prompt: 'Which instrument measures temperature, and in which unit?', options: ['A thermometer, in degrees Celsius (°C)', 'A thermometer, in grams (g)', 'A ruler, in °C', 'A balance, in °C'], explain: 'Temperature tells us how hot or cold something is. It is measured with a thermometer in °C.' },
+  { prompt: 'A metal spoon and a wooden spoon are left in a bowl of hot soup. After a while, which handle feels hotter, and why?', options: ['The metal spoon, because metal is a good conductor of heat', 'The wooden spoon, because wood absorbs soup', 'The metal spoon, because metal is shiny', 'Both feel the same'], explain: 'Heat travels through metal quickly, so the metal handle gets hot. Wood is a poor conductor.' },
+  { prompt: 'Why do many cooking pots have a metal body and a plastic handle?', options: ['Metal conducts heat to the food quickly; plastic is a poor conductor so the handle stays cool', 'Plastic is a good conductor of heat', 'Metal is a poor conductor of heat', 'Plastic makes the pot heavier'], explain: 'Each material is chosen for how well it conducts heat.' },
+  { prompt: 'Ice cream stays frozen longer in a styrofoam box. Why?', options: ['Styrofoam is a poor conductor of heat, so it slows down heat gain from the surroundings', 'Styrofoam gives out coldness', 'Styrofoam is a good conductor of heat', 'Styrofoam is very light'], explain: 'Heat flows from the warm surroundings into the box. Styrofoam slows down this heat flow.' },
+  { prompt: 'In an air-conditioned room, a metal bench feels colder than a wooden bench. Both are at the same temperature. Why?', options: ['Metal conducts heat away from your skin faster than wood', 'Metal is at a lower temperature', 'Wood gives out heat', 'Metal gives out coldness'], explain: 'Both are at room temperature. Metal is a good conductor, so heat flows from your warmer skin into it faster, and it feels colder.' },
+  { prompt: 'A cup of water at 90 °C is left in a room at 30 °C. What will its temperature be after a few hours?', options: ['30 °C', '0 °C', '60 °C', '90 °C'], explain: 'The water loses heat to the cooler surroundings until it reaches the same temperature as the room.' },
+  { prompt: 'Which of these is an example of heat <u>loss</u>?', options: ['Hot soup cooling down on the table', 'Ice cream melting in the sun', 'Butter melting in a hot pan', 'Water boiling in a kettle'], explain: 'The soup loses heat to the cooler surroundings. In the other examples, things gain heat.' },
+  { prompt: 'Why does a wool sweater keep you warm?', options: ['Wool and the air trapped in it are poor conductors, so they slow down heat loss from your body', 'Wool produces heat', 'Wool is a good conductor of heat', 'Wool reflects light'], explain: 'A sweater does not make heat. It slows down the heat your body loses to the cooler surroundings.' },
+];
+
+const HEAT_MCQ = [
+  { prompt: 'A dented ping-pong ball is put into hot water and the dent pops out. Why?', options: ['The air inside gains heat and expands', 'The water pushes the dent out', 'The plastic shrinks', 'The air inside loses heat'], explain: 'When air gains heat, it expands and pushes the dent outwards.' },
+  { prompt: 'Small gaps are left between sections of a railway track. Why?', options: ['The metal rails expand when they gain heat on hot days', 'To save metal', 'To let rainwater drain away', 'The rails contract when they gain heat'], explain: 'Metal expands when it gains heat. The gaps leave space for the rails to expand without bending.' },
+  { prompt: 'A tight metal lid on a glass jar is loosened by running hot water over the lid. Why?', options: ['The metal lid gains heat and expands', 'The hot water makes the lid slippery', 'The glass jar expands more than the lid', 'The lid loses heat and contracts'], explain: 'The metal lid gains heat from the hot water and expands, so it becomes looser.' },
+  { prompt: 'When a thermometer is placed in hot water, the liquid inside it rises. Why?', options: ['The liquid gains heat and expands', 'The liquid loses heat and contracts', 'Hot water pushes the liquid up', 'The glass tube shrinks'], explain: 'The liquid in the thermometer gains heat and expands, so it moves up the tube.' },
+  { prompt: 'Temperature is a measure of…', options: ['how hot or cold something is', 'how much an object weighs', 'how big an object is', 'how much light an object gives off'], explain: 'Temperature tells us the degree of hotness of something. We measure it in °C with a thermometer.' },
+  { prompt: 'What is our main source of heat?', options: ['The Sun', 'The Moon', 'A refrigerator', 'Ice'], explain: 'The Sun gives Earth both light and heat. Burning fuels and electric heaters are other heat sources.' },
+];
+
+const FLOW_SCENES = [
+  { a: 'Metal block', ia: '🔩', ta: 80, b: 'Beaker of water', ib: '💧', tb: 26, ca: 1, cb: 4 },
+  { a: 'Can of cold drink', ia: '🥫', ta: 6, b: 'Air in the room', ib: '🏠', tb: 30, ca: 1, cb: 400 },
+  { a: 'Bowl of hot soup', ia: '🍲', ta: 72, b: 'Basin of cold water', ib: '🧊', tb: 12, ca: 1, cb: 2 },
+  { a: 'Cup of hot tea', ia: '☕', ta: 86, b: 'Air in the room', ib: '🏠', tb: 30, ca: 1, cb: 400 },
+  { a: 'Cold metal spoon', ia: '🥄', ta: 20, b: 'Cup of warm milk', ib: '🥛', tb: 60, ca: 1, cb: 6 },
+  { a: 'Glass of water', ia: '🥛', ta: 30, b: 'Air in the room', ib: '🏠', tb: 30, ca: 1, cb: 400 },
+];
+
+const STATIONS = [
+  { id: 's1', n: 1, tone: 'sun', name: 'Light Spotter', strand: 'Light', blurb: 'Which things give off their own light, and which only reflect it?', start: startS1 },
+  { id: 's2', n: 2, tone: 'translucent', name: 'See-Through Sorter', strand: 'Light', blurb: 'Sort materials into transparent, translucent and opaque.', start: startS2 },
+  { id: 's3', n: 3, tone: 'accent', name: 'Shadow Theatre', strand: 'Shadows', blurb: 'Move puppets, change materials and drag the Sun to make the shadows asked for.', start: startS3 },
+  { id: 's4', n: 4, tone: 'metal', name: 'Conductor Race', strand: 'Heat', blurb: 'Race heat up three spoons, then sort good and poor conductors of heat.', start: startS4 },
+  { id: 's5', n: 5, tone: 'hot', name: 'Heat Flow Lab', strand: 'Heat', blurb: 'Read thermometers and predict which way heat flows.', start: startS5 },
+  { id: 's6', n: 6, tone: 'cold', name: 'Exam Challenge', strand: 'All topics', blurb: 'Exam-style questions on light, shadows and heat.', start: startS6 },
+];
+
+/* ---------- Navigation ---------- */
+let anim = null;
+function stopAnim() { if (anim) { cancelAnimationFrame(anim); anim = null; } }
+function loop(fn) { stopAnim(); const step = now => { if (fn(now) === false) { anim = null; return; } anim = requestAnimationFrame(step); }; anim = requestAnimationFrame(step); }
+function go(name) {
+  stopAnim();
+  if (name === 'home') renderHome();
+  else if (name === 'notes') renderNotes();
+  else { const st = STATIONS.find(s => s.id === name); if (st) st.start(); }
+  window.scrollTo(0, 0);
+}
+document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go); });
+
+function renderHome() {
+  const r = rankInfo();
+  const pct = Math.round(r.stars / MAX_STARS * 100);
+  view.innerHTML = `
+    <section class="hero">
+      <div class="hero-main">
+        <p class="eyebrow">Your lab adventure</p>
+        <h1>Block the light and you make a <span class="beam">shadow</span>.</h1>
+        <p class="lede">Light travels in <b>straight lines</b>. Heat flows from <b>hotter</b> to <b>colder</b>. Explore six lab stations, earn up to three stars at each, and become a Sunbeam Master.</p>
+        <div class="stage">
+          <svg id="heroSvg" viewBox="0 0 560 210" role="img" aria-label="A torch shining on a cat puppet, making a shadow on a wall"></svg>
+          <label for="heroIn">Move the puppet <input id="heroIn" type="range" min="110" max="380" value="220"></label>
+        </div>
+      </div>
+      <div class="side">
+        <div class="rank" aria-label="Your rank">
+          <p class="eyebrow">Your rank</p>
+          <p class="rank-name">${r.name}</p>
+          <div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="${MAX_STARS}" aria-valuenow="${r.stars}"><i style="width:${pct}%"></i></div>
+          <div class="rank-foot"><span class="mono">${r.stars} / ${MAX_STARS} stars</span><span>${r.next ? `${r.next[0] - r.stars} more for ${r.next[1]}` : 'Top rank reached!'}</span></div>
+        </div>
+        <div class="strands">
+          <div class="strand"><b>Light</b>Light sources, how we see, and materials that let light through.</div>
+          <div class="strand"><b>Shadows</b>How shadows form and change size, shape and direction.</div>
+          <div class="strand"><b>Heat</b>Temperature, heat flow and conductors of heat.</div>
+        </div>
+      </div>
+    </section>
+    <h2 class="section-label eyebrow">Lab stations</h2>
+    <section class="stations">
+      ${STATIONS.map(st => {
+        const b = state.best[st.id] || 0;
+        return `<article class="st" style="--tone:var(--${st.tone})">
+          <div class="st-top"><span class="st-num">STATION ${st.n} · ${st.strand.toUpperCase()}</span>${starRow(b)}</div>
+          <h3>${st.name}</h3>
+          <p>${st.blurb}</p>
+          <button class="btn${b ? ' ghost' : ''}" data-go="${st.id}">${b ? 'Play again' : 'Start'}</button>
+        </article>`;
+      }).join('')}
+      <article class="st notes">
+        <div class="st-top"><span class="st-num" style="color:var(--muted)">REVISION</span></div>
+        <h3>Science Notebook</h3>
+        <p>All the key ideas in one place: light sources, materials, shadows, temperature and heat flow.</p>
+        <button class="btn ghost" data-go="notes">Open notebook</button>
+      </article>
+    </section>`;
+  const svg = $('#heroSvg'), inp = $('#heroIn');
+  const drawHero = () => {
+    const d = +inp.value, TX = 46, TY = 105, WX = 470, h0 = 46;
+    const H = Math.min(196, h0 * (WX - TX) / (d - TX));
+    svg.innerHTML = `
+      <path d="M${TX} ${TY} L${WX} 6 L${WX} 204 Z" fill="var(--sun)" fill-opacity=".28"/>
+      <path d="M${d} ${TY - h0 / 2} L${WX} ${TY - H / 2} L${WX} ${TY + H / 2} L${d} ${TY + h0 / 2} Z" fill="#000" fill-opacity=".35"/>
+      <rect x="${WX}" y="4" width="86" height="202" rx="6" fill="var(--screen)"/>
+      <g fill="#1E1B3A" fill-opacity=".9">${shapeSvg('cat', WX + 43, TY, H)}</g>
+      <rect x="10" y="${TY - 13}" width="26" height="26" rx="5" fill="#F3F0FF"/>
+      <path d="M36 ${TY - 16} L48 ${TY - 21} V${TY + 21} L36 ${TY + 16} Z" fill="#F3F0FF"/>
+      <line x1="${d}" y1="${TY + h0 / 2}" x2="${d}" y2="200" stroke="#F3F0FF" stroke-width="2"/>
+      <g fill="var(--opaque)">${shapeSvg('cat', d, TY, h0)}</g>`;
+  };
+  inp.oninput = drawHero; drawHero();
+}
+
+function head(st, intro) {
+  return `<div class="station-head">
+    <div><button class="back" data-go="home">← Lab map</button></div>
+    <p class="eyebrow" style="color:var(--${st.tone})">Station ${st.n} · ${st.strand}</p>
+    <h2>${st.name}</h2>
+    ${intro ? `<p class="intro">${intro}</p>` : ''}
+  </div>`;
+}
+
+/* ---------- Quiz runner ---------- */
+function runQuiz(st, intro, questions) {
+  let i = 0, right = 0;
+  const n = questions.length;
+  view.innerHTML = `${head(st, intro)}
+    <div class="progress"><div class="bar"><i id="pbar"></i></div><span id="pcount" class="mono"></span></div>
+    <div id="qbox" class="qbox"></div>
+    <div id="fb" class="fb" hidden></div>`;
+  const qbox = $('#qbox'), fb = $('#fb');
+  function show() {
+    stopAnim();
+    $('#pbar').style.width = (i / n * 100) + '%';
+    $('#pcount').textContent = `${i + 1} / ${n}`;
+    fb.hidden = true; qbox.innerHTML = '';
+    questions[i].render(qbox, answered);
+  }
+  function answered(ok, explain, mark) {
+    if (ok) right++;
+    sfx(ok ? 'good' : 'bad');
+    $('#pbar').style.width = ((i + 1) / n * 100) + '%';
+    fb.className = 'fb ' + (ok ? 'good' : 'bad');
+    fb.innerHTML = `<div class="fb-mark">${mark || (ok ? 'Correct!' : 'Not quite')}</div>
+      <div class="fb-body">${explain}</div>
+      <button class="btn" id="nextBtn">${i + 1 < n ? 'Next question →' : 'See results'}</button>`;
+    fb.hidden = false;
+    const nb = $('#nextBtn');
+    nb.onclick = () => { i++; if (i < n) { show(); qbox.scrollIntoView({ block: 'nearest' }); } else finish(st, right, n); };
+    nb.focus({ preventScroll: true });
+    fb.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+  }
+  show();
+}
+
+function finish(st, right, n) {
+  stopAnim();
+  const pct = right / n;
+  const stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
+  const prev = state.best[st.id] || 0;
+  const xp = right * 10;
+  state.xp += xp;
+  state.best[st.id] = Math.max(prev, stars);
+  save(); renderHeader();
+  sfx(stars >= 2 ? 'win' : 'good');
+  const msg = [
+    'Keep going. Read the Science Notebook, then have another go.',
+    'Good start. Read the feedback carefully and try again.',
+    'Well done! A few more correct answers and you will get 3 stars.',
+    'Brilliant! You have mastered this station.',
+  ][stars];
+  view.innerHTML = `${head(st, '')}
+    <section class="results">
+      ${starRow(stars)}
+      <h2>${['Try again', 'Nice try', 'Great work', 'Excellent'][stars]}</h2>
+      <p class="score">${right} / ${n} correct · +${xp} XP</p>
+      ${stars > prev ? `<p class="score" style="color:var(--good); font-size:.95rem; margin-top:6px">New best for this station!</p>` : ''}
+      <p class="msg">${msg}</p>
+      <div class="row">
+        <button class="btn" data-go="${st.id}">Play again</button>
+        <button class="btn ghost" data-go="home">Back to lab map</button>
+        ${stars < 3 ? '<button class="btn ghost" data-go="notes">Open notebook</button>' : ''}
+      </div>
+    </section>`;
+  window.scrollTo(0, 0);
+}
+
+function mcq(q) {
+  return {
+    render(box, done) {
+      const order = shuffle(q.options.map((_, k) => k));
+      box.innerHTML = `${q.figure ? `<figure class="fig">${q.figure}</figure>` : ''}
+        <p class="prompt">${q.prompt}</p>
+        <div class="opts">${order.map((k, j) => `<button class="opt" data-k="${k}"><span class="opt-key">${'ABCD'[j]}</span><span>${q.options[k]}</span></button>`).join('')}</div>`;
+      $$('.opt', box).forEach(b => b.onclick = () => {
+        const ok = +b.dataset.k === 0;
+        $$('.opt', box).forEach(x => { x.disabled = true; if (+x.dataset.k === 0) x.classList.add('correct'); });
+        if (!ok) b.classList.add('wrong');
+        done(ok, (ok ? '' : `The answer is <b>${q.options[0]}</b>. `) + q.explain);
+      });
+    }
+  };
+}
+
+function numeric(q) {
+  return {
+    render(box, done) {
+      box.innerHTML = `${q.figure ? `<figure class="fig">${q.figure}</figure>` : ''}
+        <p class="prompt">${q.prompt}</p>
+        <form class="numform" novalidate>
+          <label for="numIn" class="sr">Your answer in ${q.unit}</label>
+          <input id="numIn" type="number" inputmode="decimal" step="any" autocomplete="off" placeholder="?">
+          <span class="unit">${q.unit}</span>
+          <button class="btn" type="submit">Check</button>
+        </form>
+        ${q.tip ? `<p class="tip">${q.tip}</p>` : ''}`;
+      const f = $('form', box), inp = $('input', f);
+      f.onsubmit = e => {
+        e.preventDefault();
+        if (inp.value.trim() === '') { inp.focus(); return; }
+        const ok = Math.abs(Number(inp.value) - q.answer) < 1e-9;
+        inp.disabled = true; $('button', f).disabled = true;
+        f.classList.add(ok ? 'correct' : 'wrong');
+        done(ok, (ok ? '' : `The answer is <b>${q.answer} ${q.unit}</b>. `) + q.explain);
+      };
+    }
+  };
+}
+
+/* ---------- Sorting board (stations 2 and 4) ---------- */
+function sortBoard(root, bins, items, onDone) {
+  let sel = null, placed = 0, firstTry = 0;
+  const missed = new Set();
+  root.innerHTML = `<p class="howto">Tap a card, then tap the box it belongs in.</p>
+    <div class="bins" style="--cols:${bins.length}">${bins.map(b => `<button class="bin" data-s="${b.key}" style="--c:var(--${b.tone})"><span class="bin-name">${b.name}</span><span class="bin-hint">${b.hint}</span><span class="bin-items" id="bin-${b.key}"></span></button>`).join('')}</div>
+    <div class="tray">${items.map((it, k) => `<button class="chip" data-k="${k}" aria-pressed="false"><span aria-hidden="true">${it.icon}</span>${it.name}</button>`).join('')}</div>
+    <div class="fb info" id="sfb"><div class="fb-body"><b>${items.length} cards</b> to sort. Pick one to begin.</div></div>`;
+  const fb = $('#sfb', root);
+  const setSel = k => {
+    sel = k;
+    $$('.chip', root).forEach(c => { const on = +c.dataset.k === k; c.classList.toggle('sel', on); c.setAttribute('aria-pressed', on); });
+    $$('.bin', root).forEach(b => b.classList.toggle('armed', k !== null));
+  };
+  $$('.chip', root).forEach(c => c.onclick = () => setSel(sel === +c.dataset.k ? null : +c.dataset.k));
+  $$('.bin', root).forEach(b => b.onclick = () => {
+    if (sel === null) { fb.className = 'fb info'; fb.innerHTML = '<div class="fb-body">Pick a card first, then tap a box.</div>'; return; }
+    const it = items[sel], chip = $(`.chip[data-k="${sel}"]`, root), bin = bins.find(x => x.key === b.dataset.s);
+    if (b.dataset.s === it.k) {
+      placed++; if (!missed.has(sel)) firstTry++;
+      sfx('good');
+      $('#bin-' + it.k, root).insertAdjacentHTML('beforeend', `<span class="placed">${it.icon} ${it.name}</span>`);
+      chip.remove(); setSel(null);
+      fb.className = 'fb good';
+      fb.innerHTML = `<div class="fb-mark">Correct!</div><div class="fb-body">${it.why}</div>`;
+      if (placed === items.length) {
+        fb.innerHTML += `<button class="btn" id="doneBtn">See results</button>`;
+        $('#doneBtn', root).onclick = () => onDone(firstTry, items.length);
+        $('#doneBtn', root).focus({ preventScroll: true });
+        fb.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+      }
+    } else {
+      missed.add(sel); sfx('bad');
+      chip.classList.remove('shake'); void chip.offsetWidth; chip.classList.add('shake');
+      fb.className = 'fb bad';
+      fb.innerHTML = `<div class="fb-mark">Not ${bin.name.toLowerCase()}</div><div class="fb-body">Think again about <b>${it.name}</b>. ${bin.ask}</div>`;
+    }
+  });
+}
+
+/* ---------- Station 1: Light Spotter ---------- */
+function startS1() {
+  const st = STATIONS[0];
+  const pick = [...shuffle(LIGHT_ITEMS.filter(x => x.src)).slice(0, 5), ...shuffle(LIGHT_ITEMS.filter(x => !x.src)).slice(0, 5)];
+  const qs = shuffle(pick).map(item => ({
+    render(box, done) {
+      box.innerHTML = `<div class="specimen"><span class="spec-icon" aria-hidden="true">${item.icon}</span><span class="spec-name">${item.name}</span><span class="spec-note">Does it give off its own light?</span></div>
+        <div class="opts">
+          <button class="opt big" data-v="1">Light source</button>
+          <button class="opt big" data-v="0">Not a light source</button>
+        </div>`;
+      $$('.opt', box).forEach(b => b.onclick = () => {
+        const ok = (b.dataset.v === '1') === item.src;
+        $$('.opt', box).forEach(x => { x.disabled = true; if ((x.dataset.v === '1') === item.src) x.classList.add('correct'); });
+        if (!ok) b.classList.add('wrong');
+        done(ok, `<b>${item.name}</b> ${item.src ? 'is' : 'is not'} a light source. ${item.why}`);
+      });
+    }
+  }));
+  runQuiz(st, 'A light source gives off its own light. Other things can only be seen when they reflect light into our eyes.', qs);
+}
+
+/* ---------- Station 2: See-Through Sorter ---------- */
+function startS2() {
+  const st = STATIONS[1];
+  const items = shuffle([
+    ...shuffle(SEE_ITEMS.transparent).slice(0, 4).map(x => ({ ...x, k: 'transparent' })),
+    ...shuffle(SEE_ITEMS.translucent).slice(0, 4).map(x => ({ ...x, k: 'translucent' })),
+    ...shuffle(SEE_ITEMS.opaque).slice(0, 4).map(x => ({ ...x, k: 'opaque' })),
+  ]);
+  const bins = [
+    { key: 'transparent', tone: 'transparent', name: 'Transparent', hint: 'Lets most light through. You can see clearly through it.', ask: 'Can you see clearly through it?' },
+    { key: 'translucent', tone: 'translucent', name: 'Translucent', hint: 'Lets some light through. Things look blurry behind it.', ask: 'Does it let only some light through?' },
+    { key: 'opaque', tone: 'opaque', name: 'Opaque', hint: 'Does not let any light through.', ask: 'Does it block all the light?' },
+  ];
+  view.innerHTML = `${head(st, 'Materials let different amounts of light pass through them. Sort each one correctly on your first try to earn stars.')}<div id="board"></div>`;
+  sortBoard($('#board'), bins, items, (r, n) => finish(st, r, n));
+}
+
+/* ---------- Station 3: Shadow Theatre ---------- */
+function setupCanvas(cv, LW, LH) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || LW;
+  if (cv._w !== w) { cv._w = w; cv.width = Math.round(w * dpr); cv.height = Math.round(w * LH / LW * dpr); }
+  const ctx = cv.getContext('2d');
+  const k = cv.width / LW;
+  ctx.setTransform(k, 0, 0, k, 0, 0);
+  ctx.clearRect(0, 0, LW, LH);
+  return ctx;
+}
+const MAT = {
+  opaque: { label: 'Cardboard (opaque)', side: 0.92, panel: 0.9 },
+  translucent: { label: 'Tracing paper (translucent)', side: 0.45, panel: 0.36 },
+  transparent: { label: 'Clear plastic (transparent)', side: 0.08, panel: 0.07 },
+};
+const TH = { TX: 50, TY: 170, SX: 440, h0: 50, PX: 470, PW: 240 };
+const shadowH = d => TH.h0 * (TH.SX - TH.TX) / (d - TH.TX);
+
+function drawTheatre(ctx, s) {
+  const { TX, TY, SX, h0, PX, PW } = TH;
+  const room = cssVar('--room'), sun = cssVar('--sun'), beam = cssVar('--beam');
+  const H = shadowH(s.d), mat = MAT[s.mat];
+  ctx.fillStyle = room; ctx.fillRect(0, 0, 720, 340);
+  // beam
+  ctx.save(); ctx.globalAlpha = 0.5; ctx.fillStyle = beam;
+  ctx.beginPath(); ctx.moveTo(TX, TY); ctx.lineTo(SX, 18); ctx.lineTo(SX, 322); ctx.closePath(); ctx.fill(); ctx.restore();
+  // shadow region behind object
+  ctx.save(); ctx.globalAlpha = mat.side; ctx.fillStyle = room;
+  ctx.beginPath(); ctx.moveTo(s.d, TY - h0 / 2); ctx.lineTo(SX, TY - H / 2); ctx.lineTo(SX, TY + H / 2); ctx.lineTo(s.d, TY + h0 / 2); ctx.closePath(); ctx.fill(); ctx.restore();
+  // rays
+  ctx.save(); ctx.strokeStyle = sun; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]);
+  [-1, 1].forEach(sg => { ctx.beginPath(); ctx.moveTo(TX, TY); ctx.lineTo(SX, TY + sg * H / 2); ctx.stroke(); });
+  ctx.restore();
+  // object card (side view) on a stick
+  ctx.fillStyle = '#F3F0FF'; ctx.fillRect(s.d - 1, TY + h0 / 2, 2, 320 - TY - h0 / 2);
+  ctx.fillStyle = cssVar('--' + s.mat); ctx.globalAlpha = s.mat === 'opaque' ? 1 : 0.75;
+  ctx.fillRect(s.d - 4, TY - h0 / 2, 8, h0); ctx.globalAlpha = 1;
+  // torch
+  ctx.fillStyle = '#F3F0FF';
+  ctx.fillRect(TX - 40, TY - 13, 28, 26);
+  ctx.beginPath(); ctx.moveTo(TX - 12, TY - 16); ctx.lineTo(TX, TY - 22); ctx.lineTo(TX, TY + 22); ctx.lineTo(TX - 12, TY + 16); ctx.closePath(); ctx.fill();
+  // screen (side)
+  ctx.fillStyle = cssVar('--screen'); ctx.fillRect(SX, 14, 8, 312);
+  // labels
+  ctx.fillStyle = '#CFC9F2'; ctx.font = '500 13px Lexend, system-ui, sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('torch', TX - 40, TY + 40); ctx.fillText('side view', 12, 24);
+  ctx.textAlign = 'center'; ctx.fillText('puppet', s.d, TY - h0 / 2 - 10); ctx.fillText('screen', SX + 4, 336);
+  // front panel
+  ctx.fillStyle = cssVar('--screen'); ctx.fillRect(PX, 14, PW, 312);
+  ctx.save(); ctx.beginPath(); ctx.rect(PX, 14, PW, 312); ctx.clip();
+  const cx = PX + PW / 2;
+  if (s.target) {
+    ctx.save(); ctx.setLineDash([7, 6]); ctx.lineWidth = 2.5; ctx.strokeStyle = '#5B3FD6';
+    shapePath(ctx, s.shape, cx, TY, s.target); ctx.stroke(); ctx.restore();
+  }
+  ctx.globalAlpha = mat.panel; ctx.fillStyle = '#1E1B3A';
+  shapePath(ctx, s.shape, cx, TY, H); ctx.fill();
+  if (s.mat === 'transparent') { ctx.globalAlpha = 0.25; ctx.strokeStyle = '#1E1B3A'; ctx.lineWidth = 1; ctx.stroke(); }
+  ctx.restore(); ctx.globalAlpha = 1;
+  // ruler on panel
+  ctx.strokeStyle = '#6A6488'; ctx.fillStyle = '#6A6488'; ctx.lineWidth = 1; ctx.font = '500 10px "DM Mono", monospace'; ctx.textAlign = 'left';
+  for (let c = 0; c <= 30; c += 2) {
+    const y = 320 - c * 10; ctx.beginPath(); ctx.moveTo(PX, y); ctx.lineTo(PX + (c % 10 ? 6 : 12), y); ctx.stroke();
+    if (c % 10 === 0) ctx.fillText(c + ' cm', PX + 14, y + 4);
+  }
+  ctx.fillStyle = '#4A4466'; ctx.font = '500 12px Lexend, system-ui, sans-serif'; ctx.textAlign = 'right';
+  ctx.fillText('on the screen', PX + PW - 8, 32);
+}
+
+const SUN = { GY: 250, PX: 360, PH: 92 };
+const fmtTime = t => { const h = Math.floor(t), m = Math.round((t - h) * 60); const hh = ((h + 11) % 12) + 1; return `${hh}:${String(m).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`; };
+function sunGeom(t) {
+  const th = Math.PI * (t - 7) / 12; // 0 = east horizon (right), PI = west (left)
+  const elev = Math.min(th, Math.PI - th);
+  const L = Math.min(330, SUN.PH / Math.tan(Math.max(elev, 0.05)));
+  const dir = Math.cos(th) > 0 ? -1 : 1; // sun on the right (east) → shadow to the left (west)
+  return { th, elev, L: Math.abs(Math.cos(th)) < 1e-6 ? 0 : L, dir, sx: SUN.PX + 300 * Math.cos(th), sy: SUN.GY - 210 * Math.sin(th) };
+}
+function drawSun(ctx, t) {
+  const { GY, PX, PH } = SUN, g = sunGeom(t);
+  ctx.fillStyle = cssVar('--sky'); ctx.fillRect(0, 0, 720, 320);
+  ctx.save(); ctx.setLineDash([4, 6]); ctx.strokeStyle = cssVar('--muted'); ctx.globalAlpha = 0.5; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.ellipse(PX, GY, 300, 210, 0, Math.PI, 2 * Math.PI); ctx.stroke(); ctx.restore();
+  ctx.fillStyle = cssVar('--ground'); ctx.fillRect(0, GY, 720, 70);
+  // shadow
+  ctx.save(); ctx.fillStyle = '#1E1B3A'; ctx.globalAlpha = 0.55;
+  ctx.beginPath(); ctx.ellipse(PX + g.dir * g.L / 2, GY + 6, Math.max(6, g.L / 2), 7, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  // pole + flag
+  ctx.fillStyle = cssVar('--ink'); ctx.fillRect(PX - 4, GY - PH, 8, PH);
+  ctx.fillStyle = cssVar('--hot'); ctx.beginPath(); ctx.moveTo(PX + 4, GY - PH); ctx.lineTo(PX + 38, GY - PH + 12); ctx.lineTo(PX + 4, GY - PH + 24); ctx.closePath(); ctx.fill();
+  // sun
+  ctx.fillStyle = cssVar('--sun');
+  ctx.beginPath(); ctx.arc(g.sx, g.sy, 22, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = cssVar('--sun'); ctx.lineWidth = 3;
+  for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; ctx.beginPath(); ctx.moveTo(g.sx + Math.cos(a) * 28, g.sy + Math.sin(a) * 28); ctx.lineTo(g.sx + Math.cos(a) * 36, g.sy + Math.sin(a) * 36); ctx.stroke(); }
+  ctx.fillStyle = cssVar('--ink'); ctx.font = '700 15px Lexend, system-ui, sans-serif';
+  ctx.textAlign = 'left'; ctx.fillText('WEST', 12, GY + 50);
+  ctx.textAlign = 'right'; ctx.fillText('EAST', 708, GY + 50);
+  ctx.textAlign = 'center'; ctx.font = '500 18px "DM Mono", monospace'; ctx.fillText(fmtTime(t), PX, 30);
+}
+
+function theatreTask(spec) {
+  return {
+    render(box, done) {
+      box.innerHTML = `<p class="prompt">${spec.prompt}</p>
+        <canvas id="shCv" aria-label="Shadow theatre: a torch, a puppet and a screen"></canvas>
+        <div class="controls">
+          <div class="ctrl"><label for="distIn">Puppet distance from torch: <span class="mono" id="distVal"></span></label><input id="distIn" type="range" min="100" max="400" value="250"></div>
+          <div class="seg" id="matSeg" role="group" aria-label="Puppet material">${Object.keys(MAT).map(m => `<button data-m="${m}" style="--c:var(--${m})" aria-pressed="${m === 'opaque'}">${MAT[m].label}</button>`).join('')}</div>
+        </div>
+        <div class="controls"><button class="btn sun" id="castBtn">Check my shadow</button><button class="btn ghost" id="skipBtn" hidden>Show me the answer</button></div>
+        <p class="tip" id="shTip">Size now: <span class="mono" id="sizeVal"></span> · Target: <span class="mono">${(spec.target / 10).toFixed(1)} cm</span></p>`;
+      const cv = $('#shCv', box), dIn = $('#distIn', box);
+      const s = { d: 250, mat: 'opaque', shape: spec.shape, target: spec.target };
+      let tries = 0, finished = false;
+      const upd = () => { s.d = +dIn.value; $('#distVal', box).textContent = ((s.d - TH.TX) / 10).toFixed(1) + ' cm'; $('#sizeVal', box).textContent = (shadowH(s.d) / 10).toFixed(1) + ' cm'; };
+      dIn.oninput = upd; upd();
+      $$('#matSeg button', box).forEach(b => b.onclick = () => { if (finished) return; s.mat = b.dataset.m; $$('#matSeg button', box).forEach(x => x.setAttribute('aria-pressed', x === b)); });
+      loop(() => { if (!cv.isConnected) return false; drawTheatre(setupCanvas(cv, 720, 340), s); });
+      const explain = `The closer the puppet is to the torch, the bigger its shadow. ${spec.mat === 'opaque' ? 'Opaque cardboard blocks all the light, so its shadow is dark.' : 'Translucent tracing paper lets some light through, so its shadow is lighter.'}`;
+      const end = (ok, mark) => {
+        finished = true; dIn.disabled = true; $('#castBtn', box).disabled = true; $('#skipBtn', box).hidden = true;
+        $$('#matSeg button', box).forEach(x => x.disabled = true);
+        done(ok, explain, mark);
+      };
+      $('#castBtn', box).onclick = () => {
+        const H = shadowH(s.d), sizeOk = Math.abs(H - spec.target) <= Math.max(8, spec.target * 0.08), matOk = s.mat === spec.mat;
+        if (sizeOk && matOk) return end(tries === 0, tries === 0 ? 'Perfect shadow!' : `Got it on try ${tries + 1}`);
+        tries++; sfx('bad');
+        const tip = $('#shTip', box);
+        const msgs = [];
+        if (!matOk) msgs.push(spec.mat === 'opaque' ? 'The shadow needs to be dark. Which material blocks all the light?' : 'The shadow needs to be light grey. Which material lets only some light through?');
+        if (!sizeOk) msgs.push(H > spec.target ? 'Too big: move the puppet away from the torch.' : 'Too small: move the puppet closer to the torch.');
+        tip.className = 'tip warn'; tip.textContent = msgs.join(' ');
+        tip.classList.remove('shake'); void tip.offsetWidth; tip.classList.add('shake');
+        if (tries >= 2) $('#skipBtn', box).hidden = false;
+      };
+      $('#skipBtn', box).onclick = () => {
+        s.mat = spec.mat; $$('#matSeg button', box).forEach(x => x.setAttribute('aria-pressed', x.dataset.m === spec.mat));
+        const d = TH.TX + TH.h0 * (TH.SX - TH.TX) / spec.target; dIn.value = Math.round(d); upd();
+        end(false, 'Here is one way to do it');
+      };
+    }
+  };
+}
+
+const SUN_GOALS = {
+  shortest: { prompt: 'Drag the time so the flagpole’s shadow is as <b>short</b> as it can be.', check: t => Math.abs(t - 12) <= 0.5, hint: 'Shadows are shortest when the Sun is highest in the sky.', answer: 12, explain: 'Around noon the Sun is highest in the sky, so the shadow is shortest.' },
+  west: { prompt: 'Drag the time so the shadow points to the <b>west</b>.', check: t => t <= 11, hint: 'A shadow forms on the side away from the Sun. Where must the Sun be?', answer: 8.5, explain: 'In the morning the Sun is in the east, so the shadow points west.' },
+  east: { prompt: 'Drag the time so the shadow points to the <b>east</b>.', check: t => t >= 13, hint: 'A shadow forms on the side away from the Sun. Where must the Sun be?', answer: 16, explain: 'In the afternoon the Sun is in the west, so the shadow points east.' },
+  longPM: { prompt: 'Drag the time to make a <b>long</b> shadow in the <b>evening</b>.', check: t => t >= 17.5, hint: 'Shadows are long when the Sun is low in the sky.', answer: 18, explain: 'In the evening the Sun is low in the west, so the shadow is long and points east.' },
+};
+function sunTask(goal) {
+  const G = SUN_GOALS[goal];
+  return {
+    render(box, done) {
+      box.innerHTML = `<p class="prompt">${G.prompt}</p>
+        <canvas id="sunCv" aria-label="A flagpole and its shadow as the Sun moves across the sky"></canvas>
+        <div class="controls"><div class="ctrl"><label for="timeIn">Time of day: <span class="mono" id="timeVal"></span></label><input id="timeIn" type="range" min="7" max="19" step="0.25" value="${goal === 'shortest' ? 8 : 12}"></div></div>
+        <div class="controls"><button class="btn sun" id="checkBtn">Check</button><button class="btn ghost" id="skipBtn" hidden>Show me the answer</button></div>
+        <p class="tip" id="sunTip">The Sun rises in the east and sets in the west.</p>`;
+      const cv = $('#sunCv', box), tIn = $('#timeIn', box);
+      let tries = 0;
+      const upd = () => { $('#timeVal', box).textContent = fmtTime(+tIn.value); };
+      tIn.oninput = upd; upd();
+      loop(() => { if (!cv.isConnected) return false; drawSun(setupCanvas(cv, 720, 320), +tIn.value); });
+      const end = (ok, mark) => { tIn.disabled = true; $('#checkBtn', box).disabled = true; $('#skipBtn', box).hidden = true; done(ok, G.explain + ' A shadow always forms on the side away from the light.', mark); };
+      $('#checkBtn', box).onclick = () => {
+        if (G.check(+tIn.value)) return end(tries === 0, tries === 0 ? 'Correct!' : `Got it on try ${tries + 1}`);
+        tries++; sfx('bad');
+        const tip = $('#sunTip', box); tip.className = 'tip warn'; tip.textContent = 'Not yet. ' + G.hint;
+        tip.classList.remove('shake'); void tip.offsetWidth; tip.classList.add('shake');
+        if (tries >= 2) $('#skipBtn', box).hidden = false;
+      };
+      $('#skipBtn', box).onclick = () => { tIn.value = G.answer; upd(); end(false, 'Here is one answer'); };
+    }
+  };
+}
+
+function startS3() {
+  const st = STATIONS[2];
+  const big = rand(17, 23) * 10, small = rand(6, 9) * 10, mid = rand(10, 15) * 10;
+  const [bigShape, smallShape] = shuffle(['cat', 'rabbit']);
+  const qs = [
+    theatreTask({ shape: bigShape, mat: 'opaque', target: big, prompt: `Make a <b>dark</b> shadow of the ${bigShape} that fits the dashed outline.` }),
+    theatreTask({ shape: 'star', mat: 'opaque', target: small, prompt: 'Make a <b>dark</b>, <b>small</b> star shadow that fits the dashed outline.' }),
+    theatreTask({ shape: 'circle', mat: 'translucent', target: mid, prompt: 'Make a <b>light grey</b> circle shadow that fits the dashed outline. Pick the right material!' }),
+    theatreTask({ shape: smallShape, mat: 'translucent', target: rand(13, 19) * 10, prompt: `Make a <b>light grey</b> ${smallShape} shadow that fits the dashed outline.` }),
+    ...shuffle(['shortest', 'west', 'east', 'longPM']).slice(0, 2).map(sunTask),
+  ];
+  runQuiz(st, 'A shadow forms when an object blocks light. Get each shadow right on your first try to earn stars. You can keep trying until you get it.', qs);
+}
+
+/* ---------- Station 4: Conductor Race ---------- */
+function startS4() {
+  const st = STATIONS[3];
+  view.innerHTML = `${head(st, 'Some materials let heat travel through them quickly. Watch the race, then sort the materials. Your stars come from the sorting.')}
+    <section class="lab-block">
+      <h3>The spoon race</h3>
+      <p>Three spoons stand in the same hot water. A bead is stuck to the top of each spoon with wax. When the top of a spoon gets hot enough, the wax melts and its bead drops.</p>
+      <canvas id="raceCv" aria-label="Metal, plastic and wooden spoons standing in hot water, each with a bead stuck on top with wax"></canvas>
+      <div class="controls"><button class="btn sun" id="raceBtn">Pour in the hot water</button><span class="mono" id="raceTime">0 min 00 s</span></div>
+      <p class="caption" id="raceCap" style="--c:var(--metal)">Predict first: which bead will drop first?</p>
+    </section>
+    <section class="lab-block">
+      <h3>Sort the conductors</h3>
+      <p>Is each material a good or a poor conductor of heat?</p>
+      <div id="board"></div>
+    </section>`;
+  const items = shuffle([
+    ...shuffle(COND_ITEMS.good).slice(0, 6).map(x => ({ ...x, k: 'good' })),
+    ...shuffle(COND_ITEMS.poor).slice(0, 6).map(x => ({ ...x, k: 'poor' })),
+  ]);
+  sortBoard($('#board'), [
+    { key: 'good', tone: 'metal', name: 'Good conductor', hint: 'Heat travels through it quickly. Most metals.', ask: 'Is it a metal? Does heat travel through it quickly?' },
+    { key: 'poor', tone: 'wood', name: 'Poor conductor', hint: 'Heat travels through it slowly.', ask: 'Does heat travel through it slowly?' },
+  ], items, (r, n) => finish(st, r, n));
+
+  const cv = $('#raceCv');
+  const SP = [
+    { name: 'Metal', tone: '--metal', T: 3.2 },
+    { name: 'Plastic', tone: '--translucent', T: 26 },
+    { name: 'Wood', tone: '--wood', T: 34 },
+  ];
+  let t0 = null, done = false;
+  const RUN = 9; // seconds of animation = 3 minutes of experiment
+  function draw(now) {
+    if (!cv.isConnected) return false;
+    const ctx = setupCanvas(cv, 720, 320);
+    const t = t0 === null ? 0 : Math.min(RUN, (now - t0) / 1000 * (reduced ? 3 : 1));
+    ctx.fillStyle = cssVar('--bg'); ctx.fillRect(0, 0, 720, 320);
+    // table
+    ctx.fillStyle = cssVar('--line'); ctx.fillRect(0, 298, 720, 22);
+    // water
+    const bx = 200, bw = 320, by = 170, bb = 296;
+    if (t0 !== null) {
+      ctx.save(); ctx.globalAlpha = 0.28; ctx.fillStyle = cssVar('--hot'); ctx.fillRect(bx + 3, by + 18, bw - 6, bb - by - 20); ctx.restore();
+      if (!reduced) { ctx.strokeStyle = cssVar('--muted'); ctx.lineWidth = 2; ctx.globalAlpha = 0.5;
+        for (let k = 0; k < 4; k++) { const x = bx + 40 + k * 80, ph = now / 400 + k; ctx.beginPath(); ctx.moveTo(x, by + 8); ctx.bezierCurveTo(x + 10 * Math.sin(ph), by - 10, x - 10 * Math.sin(ph), by - 26, x + 4, by - 40); ctx.stroke(); }
+        ctx.globalAlpha = 1; }
+    }
+    SP.forEach((sp, i) => {
+      const x = 280 + i * 80, top = 60, bot = 284;
+      const p = Math.min(1, t / sp.T);
+      const col = cssVar(sp.tone), hot = cssVar('--hot');
+      ctx.fillStyle = col; ctx.fillRect(x - 7, top, 14, bot - top);
+      if (t0 !== null) { // heat creeping up from the water line
+        const wl = by + 18, reach = wl - (wl - top) * p;
+        ctx.save(); ctx.globalAlpha = 0.85; ctx.fillStyle = hot; ctx.fillRect(x - 7, reach, 14, bot - reach); ctx.restore();
+      }
+      // bead + wax
+      const dropped = p >= 1;
+      const fall = dropped ? Math.min(1, (t - sp.T) / 0.6) : 0;
+      const beadX = x + 16 + fall * 26, beadY = top + 8 + fall * (290 - top - 8);
+      if (!dropped) { ctx.fillStyle = cssVar('--sun-soft'); ctx.beginPath(); ctx.ellipse(x + 9, top + 8, 7, 9, 0, 0, Math.PI * 2); ctx.fill(); }
+      ctx.fillStyle = cssVar('--ink'); ctx.beginPath(); ctx.arc(beadX, beadY, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = cssVar('--ink'); ctx.font = '700 14px Lexend, system-ui, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(sp.name, x, top - 14);
+    });
+    // beaker outline
+    ctx.strokeStyle = cssVar('--ink'); ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx, bb); ctx.lineTo(bx + bw, bb); ctx.lineTo(bx + bw, by); ctx.stroke();
+    const secs = Math.round(t / RUN * 180);
+    $('#raceTime').textContent = `${Math.floor(secs / 60)} min ${String(secs % 60).padStart(2, '0')} s`;
+    if (t0 !== null && t >= RUN && !done) {
+      done = true;
+      $('#raceCap').innerHTML = '<b>Result:</b> only the bead on the <b>metal</b> spoon dropped. Heat travelled up the metal spoon quickly, so the wax melted. Metal is a <b>good conductor of heat</b>. Plastic and wood are <b>poor conductors</b>, so their beads stayed on.';
+      $('#raceBtn').disabled = false; $('#raceBtn').textContent = 'Run it again';
+    }
+  }
+  loop(draw);
+  $('#raceBtn').onclick = () => { t0 = performance.now(); done = false; $('#raceBtn').disabled = true; $('#raceCap').textContent = 'Watch the heat travel up each spoon…'; };
+}
+
+/* ---------- Station 5: Heat Flow Lab ---------- */
+function thermometer(temp) {
+  const y = v => 270 - v * 2.4;
+  let ticks = '';
+  for (let v = 0; v <= 100; v += 2) {
+    const major = v % 10 === 0;
+    ticks += `<line x1="66" x2="${major ? 82 : 74}" y1="${y(v)}" y2="${y(v)}" class="tick${major ? ' major' : ''}"/>`;
+    if (major) ticks += `<text x="46" y="${y(v) + 3.5}" class="tlab">${v}</text>`;
+  }
+  return `<svg class="thermo" viewBox="0 0 120 330" role="img" aria-label="Thermometer">
+    <rect x="52" y="${y(temp)}" width="14" height="${300 - y(temp)}" class="d-hot"/>
+    <circle cx="59" cy="300" r="16" class="d-hot"/>
+    ${ticks}
+    <path d="M52 288 V20 A7 7 0 0 1 66 20 V288" class="d-line"/>
+    <circle cx="59" cy="300" r="17" class="d-line"/>
+    <text x="96" y="22" class="d-lab">°C</text>
+  </svg>`;
+}
+function thermoQ() {
+  let t; do { t = randEven(14, 94); } while (t % 10 === 0);
+  return numeric({
+    figure: thermometer(t), unit: '°C', answer: t,
+    prompt: 'What temperature does this thermometer show?',
+    tip: 'Each small mark stands for 2 °C. Read the top of the red liquid.',
+    explain: `Find the labelled mark just below the top of the liquid, then count up in 2s: <b>${t} °C</b>.`,
+  });
+}
+function flowQ(sc) {
+  return {
+    render(box, done) {
+      const tf = sc.ta === sc.tb ? sc.ta : Math.round((sc.ca * sc.ta + sc.cb * sc.tb) / (sc.ca + sc.cb));
+      const key = sc.ta > sc.tb ? 'AB' : sc.ta < sc.tb ? 'BA' : 'none';
+      const card = (id, n, ic, t) => `<div class="obj"><span class="obj-icon" aria-hidden="true">${ic}</span><span class="obj-name">${id} · ${n}</span><div class="mini"><i id="bar${id}"></i></div><span class="mono obj-t" id="t${id}">${t} °C</span></div>`;
+      box.innerHTML = `<p class="prompt">${sc.a} (${sc.ta} °C) is placed in contact with ${sc.b.toLowerCase()} (${sc.tb} °C). Which way does heat flow?</p>
+        <div class="flow">${card('A', sc.a, sc.ia, sc.ta)}<div class="flow-mid"><svg id="arw" viewBox="0 0 80 40" hidden aria-hidden="true"><path d="M5 20 H70 M56 7 L72 20 L56 33" class="arrow-path"/></svg></div>${card('B', sc.b, sc.ib, sc.tb)}</div>
+        <div class="opts">
+          <button class="opt" data-k="AB"><span class="opt-key">A</span><span>Heat flows from A to B</span></button>
+          <button class="opt" data-k="BA"><span class="opt-key">B</span><span>Heat flows from B to A</span></button>
+          <button class="opt" data-k="none"><span class="opt-key">C</span><span>No heat flows between them</span></button>
+        </div>`;
+      const paint = (id, T) => {
+        $('#t' + id, box).textContent = Math.round(T) + ' °C';
+        const bar = $('#bar' + id, box); bar.style.height = Math.max(4, T) + '%';
+        bar.style.background = `color-mix(in srgb, var(--hot) ${Math.round(T)}%, var(--cold))`;
+      };
+      paint('A', sc.ta); paint('B', sc.tb);
+      $$('.opt', box).forEach(b => b.onclick = () => {
+        const ok = b.dataset.k === key;
+        $$('.opt', box).forEach(x => { x.disabled = true; if (x.dataset.k === key) x.classList.add('correct'); });
+        if (!ok) b.classList.add('wrong');
+        if (key !== 'none') {
+          const arw = $('#arw', box); arw.hidden = false; arw.classList.toggle('rev', key === 'BA');
+          const t0 = performance.now();
+          loop(now => {
+            if (!box.isConnected) return false;
+            const p = reduced ? 1 : Math.min(1, (now - t0) / 2600), e = ease3(p);
+            paint('A', sc.ta + (tf - sc.ta) * e); paint('B', sc.tb + (tf - sc.tb) * e);
+            if (p >= 1) return false;
+          });
+        }
+        const hot = sc.ta > sc.tb ? sc.a : sc.b, cold = sc.ta > sc.tb ? sc.b : sc.a;
+        const ex = key === 'none'
+          ? `Both are at the same temperature (${sc.ta} °C), so there is no heat flow between them.`
+          : `Heat flows from the hotter ${hot.toLowerCase()} to the colder ${cold.toLowerCase()}. The hotter one loses heat and its temperature falls. The colder one gains heat and its temperature rises. They stop changing when both reach the same temperature (about ${tf} °C).`;
+        done(ok, ex);
+      });
+    }
+  };
+}
+function startS5() {
+  const st = STATIONS[4];
+  const base = shuffle(FLOW_SCENES.slice(0, 5));
+  const scenes = [base[0], base[1], Math.random() < 0.5 ? FLOW_SCENES[5] : base[2]];
+  const mcqs = shuffle(HEAT_MCQ).slice(0, 3);
+  const qs = [thermoQ(), flowQ(scenes[0]), mcq(mcqs[0]), thermoQ(), flowQ(scenes[1]), mcq(mcqs[1]), thermoQ(), flowQ(scenes[2]), mcq(mcqs[2])];
+  runQuiz(st, 'Temperature tells us how hot or cold something is. Heat flows from a hotter object to a colder one.', qs);
+}
+
+/* ---------- Station 6: Exam Challenge ---------- */
+function startS6() {
+  const light = shuffle(EXAM.slice(0, 15)).slice(0, 6), heat = shuffle(EXAM.slice(15)).slice(0, 4);
+  runQuiz(STATIONS[5], 'Ten exam-style questions on light, shadows and heat. Read each one carefully before you answer.', shuffle([...light, ...heat]).map(mcq));
+}
+
+/* ---------- Notebook ---------- */
+function renderNotes() {
+  view.innerHTML = `<div class="station-head">
+      <div><button class="back" data-go="home">← Lab map</button></div>
+      <p class="eyebrow">Revision</p>
+      <h2>Science Notebook</h2>
+      <p class="intro">The key ideas for P4 Light, Shadows and Heat. Read these before you try a station again.</p>
+    </div>
+    <div class="notes-grid">
+      <section class="note">
+        <h3>Light and how we see</h3>
+        <p class="def">We see an object when <b>light from the object enters our eyes</b>.</p>
+        <ul>
+          <li>A <b>light source</b> gives off its own light: the Sun, stars, fire, a lit candle, a switched-on torch, a glowing firefly.</li>
+          <li>The Moon, mirrors and shiny objects are <b>not</b> light sources. They only reflect light.</li>
+          <li>Most objects are seen because they <b>reflect</b> light into our eyes. In total darkness we cannot see them.</li>
+          <li>Light travels in <b>straight lines</b>.</li>
+        </ul>
+      </section>
+      <section class="note">
+        <h3>Light through materials</h3>
+        <div class="wrap-x"><table class="ntable">
+          <thead><tr><th></th><th>Light passing through</th><th>Examples</th></tr></thead>
+          <tbody>
+            <tr><th scope="row" style="color:var(--transparent)">Transparent</th><td>Most light</td><td>Clear glass, clear plastic, cling wrap</td></tr>
+            <tr><th scope="row" style="color:var(--translucent)">Translucent</th><td>Some light</td><td>Frosted glass, tracing paper, tissue paper</td></tr>
+            <tr><th scope="row" style="color:var(--opaque)">Opaque</th><td>No light</td><td>Wood, cardboard, metal, brick</td></tr>
+          </tbody>
+        </table></div>
+        <ul><li>A light sensor (data logger) can measure how much light passes through a material.</li></ul>
+      </section>
+      <section class="note">
+        <h3>Shadows</h3>
+        <p class="def">A shadow forms when an object <b>blocks light</b>.</p>
+        <ul>
+          <li>Opaque objects cast dark shadows. Translucent objects cast lighter shadows. Transparent objects cast very faint shadows or none.</li>
+          <li>Moving the object <b>closer to the light</b> makes the shadow <b>bigger</b>. Moving it away makes the shadow smaller.</li>
+          <li>The shadow's shape depends on the object's shape and how it faces the light.</li>
+          <li>A shadow forms on the side <b>away from the light</b>. A shadow is dark, whatever colour the object is.</li>
+          <li>Sun shadows are <b>long</b> in the morning and evening (Sun low) and <b>shortest around noon</b> (Sun high). Morning shadows point west; afternoon shadows point east.</li>
+        </ul>
+      </section>
+      <section class="note">
+        <h3>Heat and temperature</h3>
+        <p class="def"><b>Heat</b> is a form of energy. <b>Temperature</b> is a measure of how hot or cold something is, in <span class="mono">°C</span>, measured with a thermometer.</p>
+        <ul>
+          <li>The <b>Sun</b> is our main source of heat. Others: burning fuels, electric heaters, rubbing hands together.</li>
+          <li>Heat flows from a <b>hotter</b> object to a <b>colder</b> one until both reach the <b>same temperature</b>.</li>
+          <li>Gaining heat makes temperature rise; losing heat makes it fall.</li>
+          <li>Effects of heat: things <b>expand</b> when they gain heat and <b>contract</b> when they lose heat (railway gaps, dented ping-pong ball, tight jar lids, thermometers). Heat can also change the state of matter (ice melting).</li>
+        </ul>
+      </section>
+      <section class="note">
+        <h3>Conductors of heat</h3>
+        <ul>
+          <li><b>Good conductors</b> let heat travel through them quickly: most metals such as steel, copper, aluminium, iron and silver.</li>
+          <li><b>Poor conductors</b> let heat travel through them slowly: wood, plastic, rubber, styrofoam, cloth, wool and air.</li>
+          <li>Pots have metal bodies (to heat food quickly) and plastic or wooden handles (to stay cool).</li>
+          <li>Styrofoam boxes, wool sweaters and trapped air slow down heat flow, keeping things cold or warm.</li>
+          <li>A metal bench feels colder than a wooden one at the same temperature because metal conducts heat away from your skin faster.</li>
+        </ul>
+      </section>
+    </div>`;
+}
+
+/* ---------- Boot ---------- */
+window.claude?.hot?.snapshot?.(() => ({ state }));
+const start = data => {
+  if (data && data.state) state = { ...state, ...data.state }; else load();
+  renderHeader();
+  go('home');
+};
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+</body>
+</html>
