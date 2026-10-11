@@ -343,7 +343,7 @@ const starRow = n => `<span class="stars" role="img" aria-label="${n} of 3 stars
 const MAX_STARS = 18;
 const RANKS = [[0, 'Spark'], [5, 'Torch Bearer'], [10, 'Shadow Scientist'], [15, 'Heat Expert'], [18, 'Sunbeam Master']];
 const totalStars = () => Object.values(state.best).reduce((a, b) => a + b, 0);
-const starsFor = (right, n) => { const miss = n - right; return miss <= 1 ? 3 : miss <= 3 ? 2 : right >= n / 2 ? 1 : 0; };
+const starsFor = (right, n) => { const miss = n - right; return miss <= 1 ? 3 : miss <= 3 ? 2 : right >= Math.min(n / 2, n - 4) ? 1 : 0; };
 const RULES = `<p class="rules">${STAR(true)}${STAR(true)}${STAR(true)} 0–1 mistakes · ${STAR(true)}${STAR(true)} 2–3 mistakes. Only your first try at each question counts.</p>`;
 function rankInfo() {
   const s = totalStars();
@@ -384,7 +384,7 @@ const ICON_MIRROR = `<svg viewBox="0 0 40 48"><ellipse cx="20" cy="19" rx="14" r
 
 const LIGHT_ITEMS = [
   { name: 'The Sun', icon: '☀️', src: true, why: 'The Sun gives off its own light. It is our main source of light.' },
-  { name: 'Stars at night', icon: '⭐', src: true, why: 'Stars are like our Sun. They give off their own light.' },
+  { name: 'A star at night', icon: '⭐', src: true, why: 'A star is like our Sun. It gives off its own light.' },
   { name: 'A lit candle', icon: '🕯️', src: true, why: 'The burning flame gives off its own light.' },
   { name: 'A glowing firefly', icon: '✨', src: true, why: 'A firefly makes its own light with its body.' },
   { name: 'A switched-on torch', icon: '🔦', src: true, why: 'A torch that is switched on gives off its own light.' },
@@ -395,7 +395,7 @@ const LIGHT_ITEMS = [
   { name: 'A mirror', icon: ICON_MIRROR, src: false, why: 'A mirror only reflects light. In a dark room, you cannot see it.' },
   { name: 'A diamond', icon: '💎', src: false, why: 'A diamond sparkles because it reflects light. It does not make its own.' },
   { name: 'A bicycle reflector', icon: '🚲', src: false, why: 'A reflector shines only when light (for example from car headlights) falls on it and is reflected into our eyes. It does not give off its own light.' },
-  { name: 'A cat’s eyes at night', icon: '🐱', src: false, why: 'A cat’s eyes seem to glow because they reflect light. They do not make light.' },
+  { name: 'A cat’s eyes at night', icon: '🐱', src: false, plural: true, why: 'A cat’s eyes seem to glow because they reflect light. They do not make light.' },
   { name: 'A shiny foil wrapper', icon: '🍫', src: false, why: 'Shiny foil reflects light well, but it does not give off its own light.' },
   { name: 'A switched-off torch', icon: '🔦', src: false, why: 'When it is switched off, the torch gives off no light. It is not a light source now.' },
   { name: 'A shiny spoon', icon: '🥄', src: false, why: 'A shiny spoon reflects light. It does not give off its own light.' },
@@ -477,7 +477,7 @@ const EXAM_LIGHT = [
   { prompt: 'Ali is in a totally dark room with a red ball. He cannot see the ball. Why?', options: ['No light is reflected from the ball into his eyes', 'The ball is red, so it cannot be seen', 'His eyes do not give out enough light', 'The ball is too far away from his eyes'], explain: 'There is no light for the ball to reflect, so no light from the ball enters his eyes.' },
   { prompt: 'Which material is translucent?', options: ['Tracing paper', 'Clear glass', 'Cardboard', 'Aluminium foil'], explain: 'Translucent materials let some light through. Clear glass is transparent; cardboard and foil are opaque.' },
   { figure: DIAGRAMS.meter, prompt: 'Sheets P, Q and R were placed one at a time between a torch and a light sensor. Which sheet is best for a bathroom window that lets in light but stops people from seeing in?', options: ['Q', 'P', 'R', 'None of them'], explain: 'Q lets some light through, so it is translucent. P lets no light through (opaque). R lets almost as much light through as no sheet at all (transparent), so people could see in.' },
-  { figure: DIAGRAMS.meter, prompt: 'Siti used a torch and a light sensor to compare the sheets. What must she keep the same to make it a fair test?', options: ['The distance between the torch and the sensor', 'The material of each sheet', 'The light sensor reading', 'The letter used to name each sheet'], explain: 'Only the material should change. The torch, its distance from the sensor and the size and thickness of each sheet must stay the same.' },
+  { figure: DIAGRAMS.meter, prompt: 'Siti used a torch and a light sensor to compare the sheets. What must she keep the same to make it a fair test?', options: ['The distance between the torch and the sensor', 'The type of material that each sheet is made of', 'The amount of light that the sensor detects', 'The order in which she tests the sheets'], explain: 'Only the material should change. The torch, its distance from the sensor and the size and thickness of each sheet must stay the same.' },
   { prompt: 'A shadow is formed when…', options: ['light is blocked by an object', 'light passes through a transparent object', 'an object gives off its own light', 'light bends around an object'], explain: 'Light travels in straight lines. When an object blocks the light completely or partly, a shadow forms behind it.' },
   { figure: DIAGRAMS.torch, prompt: 'Ravi moves the toy closer to the torch. The torch and screen do not move. What happens to the shadow on the screen?', options: ['It becomes bigger', 'It becomes smaller', 'It stays the same size', 'It disappears'], explain: 'The closer the object is to the light source, the more light it blocks, so the shadow becomes bigger.' },
   { figure: DIAGRAMS.torch, prompt: 'Ravi moves the toy away from the torch, closer to the <u>screen</u>. The torch and screen do not move. What happens to the shadow?', options: ['It becomes smaller', 'It becomes bigger', 'It becomes lighter in colour', 'It turns upside down'], explain: 'Moving the toy away from the torch makes it block less of the light, so the shadow gets smaller.' },
@@ -485,20 +485,20 @@ const EXAM_LIGHT = [
   { figure: DIAGRAMS.torch, prompt: 'Ravi moves the <u>torch</u> closer to the toy. The toy and screen do not move. What happens to the shadow?', options: ['It becomes bigger', 'It becomes smaller', 'It stays the same size', 'It moves above the toy'], explain: 'When the light source is closer to the object, the object blocks more of the light, so the shadow becomes bigger.' },
   { prompt: 'Which object would cast the darkest shadow?', options: ['A wooden block', 'A sheet of frosted glass', 'A clear glass plate', 'A piece of tracing paper'], explain: 'Opaque objects like wood block all light, so they cast the darkest shadows.' },
   { prompt: 'At about what time of the day is your shadow the shortest?', options: ['Around noon', 'Early morning', 'Late afternoon', 'Just before sunset'], explain: 'Around noon the Sun is high up in the sky, so shadows are shortest. In the morning and evening the Sun is low and shadows are long.' },
-  { figure: DIAGRAMS.sunPole, prompt: 'In the morning, the Sun is in the east. In which direction does the shadow of the pole point?', options: ['West', 'East', 'Towards the Sun', 'Straight up'], explain: 'A shadow forms on the side away from the light. With the Sun in the east, the shadow points west.' },
-  { prompt: 'Which observation shows that light travels in straight lines?', options: ['A shadow has the outline of the object, as seen from the light', 'Mirrors reflect light, so they look shiny', 'Clear glass lets most light pass through it', 'The Sun gives out both light and heat'], explain: 'Light travels in straight lines and cannot bend around an object, so a dark area with the object’s outline (as seen from the light) forms behind it.' },
+  { figure: DIAGRAMS.sunPole, prompt: 'In the morning, the Sun is in the east. In which direction does the shadow of the pole point?', options: ['West', 'East', 'North', 'South'], explain: 'A shadow forms on the side away from the light. With the Sun in the east, the shadow points west.' },
+  { prompt: 'Which observation shows that light travels in straight lines?', options: ['A shadow has the outline of the object, as seen from the light', 'A mirror reflects light, so it looks shiny and bright', 'Clear glass lets most of the light pass through it', 'The Sun gives out both light and heat to the Earth'], explain: 'Light travels in straight lines and cannot bend around an object, so a dark area with the object’s outline (as seen from the light) forms behind it.' },
   { prompt: 'Mary shines a torch on an ice-cream cone (a cone shape), holding it in different ways. Which shadows can she make?', options: ['A circle or a triangle', 'Only a triangle', 'Only a circle', 'A square'], explain: 'The shape of a shadow depends on which side of the object faces the light. A cone can give a circle (pointing at the torch) or a triangle (side on).' },
   { prompt: 'Ravi shines a torch on a red plastic toy. The toy is opaque. What colour is its shadow on a white screen?', options: ['Dark, not red', 'Red', 'Pink', 'White, the same as the screen'], explain: 'A shadow is an area where light is blocked, so it is dark. It does not take the colour of the object.' },
 ];
 
 const EXAM_HEAT = [
   { prompt: 'Heat always flows from…', options: ['a hotter object to a colder object', 'a colder object to a hotter object', 'a bigger object to a smaller object', 'a metal object to a non-metal object'], explain: 'Heat flows from a hotter place or object to a colder one, until both are at the same temperature.' },
-  { prompt: 'Which instrument measures temperature, and in which unit?', options: ['A thermometer, in degrees Celsius (°C)', 'A thermometer, in grams (g)', 'A ruler, in degrees Celsius (°C)', 'A balance, in degrees Celsius (°C)'], explain: 'Temperature tells us how hot or cold something is. It is measured with a thermometer (or a temperature sensor) in °C.' },
+  { prompt: 'Which instrument measures temperature, and in which unit?', options: ['A thermometer, in degrees Celsius (°C)', 'A thermometer, in grams (g)', 'A ruler, in degrees Celsius (°C)', 'A balance, in degrees Celsius (°C)'], explain: 'Temperature tells us how hot or cold something is. It is measured with a thermometer (or a temperature sensor) in °C.' },
   { prompt: 'A metal spoon and a wooden spoon are left in a bowl of hot soup. After a while, which handle feels hotter, and why?', options: ['The metal spoon, because metal is a good conductor of heat', 'The wooden spoon, because wood soaks up the hot soup', 'The metal spoon, because metal is shiny and bright', 'Both handles feel equally hot after a while'], explain: 'Heat travels through metal quickly, so the metal handle gets hot. Wood is a poor conductor.' },
   { prompt: 'Many cooking pots have a metal body and a plastic handle. Why?', options: ['Metal is a good conductor; plastic is a poor conductor', 'Metal is a poor conductor; plastic is a good conductor', 'Both metal and plastic are good conductors of heat', 'Both metal and plastic are poor conductors of heat'], explain: 'The metal body conducts heat to the food quickly. The plastic handle conducts heat slowly, so it stays cool enough to hold.' },
   { prompt: 'Ice cream stays frozen longer in a styrofoam box. Why?', options: ['Styrofoam is a poor conductor of heat', 'Styrofoam is a good conductor of heat', 'Styrofoam gives out coldness', 'Styrofoam stops coldness from escaping'], explain: 'Heat flows from the warm surroundings into the box. Styrofoam slows down this heat gain, so the ice cream melts more slowly.' },
   { prompt: 'In an air-conditioned room, a metal bench feels colder than a wooden bench. Both are at the same temperature. Why?', options: ['Metal conducts heat away from your skin faster', 'Metal is at a lower temperature than wood', 'Wood gives out heat to your skin', 'Metal gives out coldness to your skin'], explain: 'Both are at room temperature. Metal is a good conductor, so heat flows from your warmer skin into it faster, and it feels colder.' },
-  { prompt: 'A cup of water at 90 °C is left in a room at 30 °C. What will its temperature be after a few hours?', options: ['30 °C', '0 °C', '60 °C', '90 °C'], explain: 'The water loses heat to the cooler surroundings until it reaches the same temperature as the room.' },
+  { prompt: 'A cup of water at 90 °C is left in a room at 30 °C. What will its temperature be after a few hours?', options: ['30 °C', '0 °C', '60 °C', '90 °C'], explain: 'The water loses heat to the cooler surroundings until it reaches the same temperature as the room.' },
   { prompt: 'Which of these things is <u>losing</u> heat?', options: ['Hot soup that is cooling down on the table', 'Ice cream that is melting in the sun', 'Butter that is melting in a hot pan', 'Water that is boiling in a kettle'], explain: 'The soup loses heat to the cooler surroundings. The ice cream, butter and water are all gaining heat.' },
   { prompt: 'Why does a wool sweater keep you warm on a cold day?', options: ['It slows down heat loss from your body', 'It produces heat to warm your body', 'It is a good conductor of heat', 'It stops coldness from entering your body'], explain: 'A sweater does not make heat. Wool and the air trapped in it are poor conductors, so they slow down the heat your body loses to the cooler surroundings.' },
   { prompt: 'Which statement about heat and temperature is correct?', options: ['Heat is energy; temperature is how hot or cold something is', 'Temperature is energy; heat is how hot or cold something is', 'Heat and temperature are the same thing', 'A thermometer measures the heat in an object'], explain: 'Heat is a form of energy that flows from a hotter object to a colder one. Temperature tells us how hot or cold something is. A thermometer measures temperature, not heat.' },
@@ -509,7 +509,7 @@ const HEAT_MCQ = [
   { prompt: 'Small gaps are left between sections of a railway track. Why?', options: ['The rails expand when they gain heat on hot days', 'The rails contract when they gain heat on hot days', 'The gaps let rainwater drain away', 'The gaps save metal when building the track'], explain: 'Metal expands when it gains heat. The gaps leave space for the rails to expand without bending.' },
   { prompt: 'A tight metal lid on a glass jar is loosened by running hot water over the lid. Why?', options: ['The metal lid gains heat and expands', 'The hot water makes the lid slippery', 'The glass jar expands more than the lid', 'The lid loses heat and contracts'], explain: 'The hot water runs mainly over the metal lid. The lid gains heat and expands. Metal also expands more than glass, so the lid becomes looser.' },
   { prompt: 'When a thermometer is placed in hot water, the liquid inside it rises. Why?', options: ['The liquid gains heat and expands', 'The liquid loses heat and contracts', 'The hot water pushes the liquid up', 'The glass tube becomes narrower'], explain: 'The liquid in the thermometer gains heat and expands, so it moves up the tube.' },
-  { prompt: 'Temperature is a measure of…', options: ['how hot or cold something is', 'how heavy an object is', 'how big an object is', 'how much light an object gives off'], explain: 'Temperature tells us how hot or cold something is. We measure it in °C with a thermometer.' },
+  { prompt: 'Temperature is a measure of…', options: ['how hot or cold something is', 'how heavy an object is', 'how big an object is', 'how much light an object gives off'], explain: 'Temperature tells us how hot or cold something is. We measure it in °C with a thermometer.' },
   { prompt: 'What is our main source of heat?', options: ['The Sun', 'The Moon', 'A refrigerator', 'A block of ice'], explain: 'The Sun gives the Earth both light and heat. Burning fuels and electric heaters are other heat sources.' },
   { prompt: 'A blown-up balloon is put in a fridge. After an hour it looks smaller. Why?', options: ['The air inside loses heat and contracts', 'The air inside gains heat and expands', 'The fridge squeezes the balloon', 'Coldness enters the balloon'], explain: 'The air inside loses heat to the colder fridge and contracts, so the balloon becomes smaller.' },
   { prompt: 'An ice cube is left on a plate in the classroom. What happens to it?', options: ['It gains heat and melts', 'It loses heat and melts', 'It gains heat and freezes', 'It gives out coldness and melts'], explain: 'The ice gains heat from the warmer surroundings and changes from solid to liquid. Heat can change the state of matter.' },
@@ -517,14 +517,14 @@ const HEAT_MCQ = [
 
 // q: the setup sentence. a/b: short names. room: the air in a room (its temperature hardly changes).
 const FLOW_SCENES = [
-  { q: 'A metal block at 80 °C is put into a beaker of water at 26 °C.', a: 'Metal block', ia: '🔩', ta: 80, b: 'Water', ib: '💧', tb: 26, ca: 1, cb: 4 },
-  { q: 'A can of drink at 6 °C is taken out of the fridge and left in a room at 30 °C.', a: 'Can of drink', ia: '🥫', ta: 6, b: 'Air in the room', ib: '🏠', tb: 30, room: true },
-  { q: 'A bowl of soup at 72 °C is placed in a basin of water at 12 °C.', a: 'Bowl of soup', ia: '🍲', ta: 72, b: 'Basin of water', ib: '💧', tb: 12, ca: 1, cb: 2 },
-  { q: 'A cup of tea at 86 °C is left on a table in a room at 30 °C.', a: 'Cup of tea', ia: '☕', ta: 86, b: 'Air in the room', ib: '🏠', tb: 30, room: true },
-  { q: 'A metal spoon at 20 °C is put into a cup of milk at 60 °C.', a: 'Metal spoon', ia: '🥄', ta: 20, b: 'Cup of milk', ib: '🥛', tb: 60, ca: 1, cb: 30 },
-  { q: 'A glass of cold water at 10 °C is touching a can of drink from the fridge at 4 °C.', a: 'Glass of water', ia: '🥛', ta: 10, b: 'Can of drink', ib: '🥫', tb: 4, ca: 2, cb: 1 },
+  { q: 'A metal block at 80 °C is put into a beaker of water at 26 °C.', a: 'Metal block', ia: '🔩', ta: 80, b: 'Water', ib: '💧', tb: 26, ca: 1, cb: 4 },
+  { q: 'A can of drink at 6 °C is taken out of the fridge and left in a room at 30 °C.', a: 'Can of drink', ia: '🥫', ta: 6, b: 'Air in the room', ib: '🏠', tb: 30, room: true },
+  { q: 'A bowl of soup at 72 °C is placed in a basin of water at 12 °C.', a: 'Bowl of soup', ia: '🍲', ta: 72, b: 'Basin of water', ib: '💧', tb: 12, ca: 1, cb: 2 },
+  { q: 'A cup of tea at 86 °C is left on a table in a room at 30 °C.', a: 'Cup of tea', ia: '☕', ta: 86, b: 'Air in the room', ib: '🏠', tb: 30, room: true },
+  { q: 'A metal spoon at 20 °C is put into a cup of milk at 60 °C.', a: 'Metal spoon', ia: '🥄', ta: 20, b: 'Cup of milk', ib: '🥛', tb: 60, ca: 1, cb: 30 },
+  { q: 'A glass of cold water at 10 °C and a can of drink at 4 °C are put touching each other inside a closed styrofoam box.', a: 'Glass of water', ia: '💧', ta: 10, b: 'Can of drink', ib: '🥫', tb: 4, ca: 2, cb: 1 },
 ];
-const SAME_SCENE = { q: 'A glass of water at 30 °C has been left in a room at 30 °C.', a: 'Glass of water', ia: '🥛', ta: 30, b: 'Air in the room', ib: '🏠', tb: 30, room: true };
+const SAME_SCENE = { q: 'A glass of water at 30 °C has been left in a room at 30 °C.', a: 'Glass of water', ia: '💧', ta: 30, b: 'Air in the room', ib: '🏠', tb: 30, room: true };
 
 const STATIONS = [
   { id: 's1', n: 1, tone: 'sun', name: 'Light Spotter', strand: 'Light', blurb: 'Which things give off their own light, and which only reflect it?', start: startS1 },
@@ -541,7 +541,7 @@ function stopAnim() { if (anim) { cancelAnimationFrame(anim); anim = null; } }
 function loop(fn) { stopAnim(); const step = now => { if (fn(now) === false) { anim = null; return; } anim = requestAnimationFrame(step); }; anim = requestAnimationFrame(step); }
 function focusFirst(sel) { const h = view.querySelector(sel); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } }
 function go(name, boot) {
-  stopAnim();
+  stopAnim(); clearView();
   if (name === 'home') renderHome();
   else if (name === 'notes') renderNotes();
   else { const st = STATIONS.find(s => s.id === name); if (st) st.start(); }
@@ -563,12 +563,15 @@ function setupCanvas(cv, LW, LH) {
   return ctx;
 }
 const fs = (ctx, px) => Math.round(px * ctx._grow);
+let teardown = [];
+function clearView() { teardown.forEach(f => f()); teardown = []; }
 function autoRedraw(cv, draw) {
   draw();
-  const ro = new ResizeObserver(() => { if (cv.isConnected) draw(); else ro.disconnect(); });
+  const ro = new ResizeObserver(() => { if (cv.isConnected) draw(); });
   ro.observe(cv);
-  const onTheme = () => { if (cv.isConnected) draw(); else darkMq.removeEventListener('change', onTheme); };
+  const onTheme = () => { if (cv.isConnected) draw(); };
   darkMq.addEventListener('change', onTheme);
+  teardown.push(() => { ro.disconnect(); darkMq.removeEventListener('change', onTheme); cv.width = cv.height = 0; });
 }
 
 function renderHome() {
@@ -602,12 +605,12 @@ function renderHome() {
     <h2 class="section-label eyebrow">Lab stations</h2>
     <section class="stations">
       ${STATIONS.map(st => {
-        const b = state.best[st.id] || 0;
+        const b = state.best[st.id] || 0, played = st.id in state.best;
         return `<article class="st" style="--tone:var(--${st.tone})">
           <div class="st-top"><span class="st-num">STATION ${st.n} · ${st.strand.toUpperCase()}</span>${starRow(b)}</div>
           <h3>${st.name}</h3>
           <p>${st.blurb}</p>
-          <button class="btn${b ? ' ghost' : ''}" data-go="${st.id}">${b ? 'Play again' : 'Start'}</button>
+          <button class="btn${played ? ' ghost' : ''}" data-go="${st.id}">${played ? 'Play again' : 'Start'}</button>
         </article>`;
       }).join('')}
       <article class="st notes">
@@ -638,7 +641,7 @@ function renderHome() {
 function head(st, intro, rules = true) {
   return `<div class="station-head">
     <div><button class="back" data-go="home">← Lab map</button></div>
-    <p class="eyebrow" style="color:color-mix(in srgb,var(--${st.tone}) 55%,var(--ink))">Station ${st.n} · ${st.strand}</p>
+    <p class="eyebrow" style="color:color-mix(in srgb,var(--${st.tone}) 45%,var(--ink))">Station ${st.n} · ${st.strand}</p>
     <h2>${st.name}</h2>
     ${intro ? `<p class="intro">${intro}</p>` : ''}
     ${rules ? RULES : ''}
@@ -657,7 +660,7 @@ function runQuiz(st, intro, questions) {
     <div id="fb" class="fb" hidden></div>`;
   const qbox = $('#qbox'), fb = $('#fb');
   function show() {
-    stopAnim();
+    stopAnim(); clearView();
     $('#pbar').style.width = (i / n * 100) + '%';
     $('#pcount').textContent = `${i + 1} / ${n}`;
     fb.hidden = true; qbox.innerHTML = '';
@@ -684,7 +687,7 @@ function runQuiz(st, intro, questions) {
 }
 
 function finish(st, right, n) {
-  stopAnim();
+  stopAnim(); clearView();
   const stars = starsFor(right, n);
   const prev = state.best[st.id] || 0;
   const xp = right * 10;
@@ -732,7 +735,9 @@ function mcq(q) {
       $$('.opt', box).forEach(b => b.onclick = () => {
         const ok = b.dataset.k === '0';
         markOpts(box, '0', b);
-        done(ok, (ok ? '' : `The answer is <b>${q.options[0]}</b>. `) + q.explain);
+        const stem = q.prompt.replace(/<[^>]+>/g, '');
+        const ans = /…$/.test(stem) ? `${stem.slice(0, -1).trim()} <b>${q.options[0]}</b>` : `<b>${q.options[0]}</b>`;
+        done(ok, (ok ? '' : `The answer is: ${ans}. `) + q.explain);
       });
     }
   };
@@ -758,7 +763,7 @@ function numeric(q) {
         const ok = Math.abs(Number(inp.value) - q.answer) < 1e-9;
         inp.disabled = true; $('button', f).disabled = true;
         f.classList.add(ok ? 'correct' : 'wrong');
-        done(ok, (ok ? '' : `The answer is <b>${q.answer} ${q.unit}</b>. `) + q.explain);
+        done(ok, (ok ? '' : `The answer is <b>${q.answer}&nbsp;${q.unit}</b>. `) + q.explain);
       };
     }
   };
@@ -769,7 +774,7 @@ function sortBoard(root, bins, items, onDone) {
   let sel = null, placed = 0, firstTry = 0;
   const missed = new Set();
   root.innerHTML = `<p class="howto">Tap a card, then tap the box it belongs in.</p>
-    <div class="bins" style="--cols:${bins.length}">${bins.map(b => `<button class="bin" data-s="${b.key}" style="--c:var(--${b.tone})"><span class="bin-name">${b.name}</span><span class="bin-hint">${b.hint}</span><span class="bin-items" id="bin-${b.key}"></span></button>`).join('')}</div>
+    <div class="bins" style="--cols:${bins.length}">${bins.map(b => `<button class="bin" data-s="${b.key}" style="--c:var(--${b.tone})" aria-labelledby="bn-${b.key} bh-${b.key}" aria-describedby="bin-${b.key}"><span class="bin-name" id="bn-${b.key}">${b.name}</span><span class="bin-hint" id="bh-${b.key}">${b.hint}</span><span class="bin-items" id="bin-${b.key}"></span></button>`).join('')}</div>
     <div class="tray">${items.map((it, k) => `<button class="chip" data-k="${k}" aria-pressed="false"><span aria-hidden="true">${it.icon}</span>${it.name}</button>`).join('')}</div>
     <div class="fb info sfb" id="sfb" aria-live="polite"><div class="fb-body"><b>${items.length} cards</b> to sort. Pick one to begin.</div></div>`;
   const fb = $('#sfb', root);
@@ -780,12 +785,16 @@ function sortBoard(root, bins, items, onDone) {
   };
   $$('.chip', root).forEach(c => c.onclick = () => setSel(sel === +c.dataset.k ? null : +c.dataset.k));
   $$('.bin', root).forEach(b => b.onclick = () => {
-    if (sel === null) { fb.className = 'fb info sfb'; fb.innerHTML = '<div class="fb-body">Pick a card first, then tap a box.</div>'; return; }
+    if (placed === items.length) return;
+    if (sel === null) {
+      if (!fb.querySelector('.pick-hint')) fb.insertAdjacentHTML('beforeend', '<div class="fb-body pick-hint">Pick a card first, then tap a box.</div>');
+      return;
+    }
     const it = items[sel], chip = $(`.chip[data-k="${sel}"]`, root), bin = bins.find(x => x.key === b.dataset.s);
     if (b.dataset.s === it.k) {
       placed++; if (!missed.has(sel)) firstTry++;
       sfx('good');
-      $('#bin-' + it.k, root).insertAdjacentHTML('beforeend', `<span class="placed">${it.icon} ${it.name}</span>`);
+      $('#bin-' + it.k, root).insertAdjacentHTML('beforeend', `<span class="placed"><span aria-hidden="true">${it.icon}</span> ${it.name}</span>`);
       chip.remove(); setSel(null);
       fb.className = 'fb good sfb';
       fb.innerHTML = `<div class="fb-mark">Correct!</div><div class="fb-body">${it.why}</div>`;
@@ -801,7 +810,7 @@ function sortBoard(root, bins, items, onDone) {
       missed.add(sel); sfx('bad');
       chip.classList.remove('shake'); void chip.offsetWidth; chip.classList.add('shake');
       fb.className = 'fb bad sfb';
-      fb.innerHTML = `<div class="fb-mark">Not ${bin.wrong}</div><div class="fb-body">Think again about <b>${it.name}</b>. ${bin.ask}</div>`;
+      fb.innerHTML = `<div class="fb-mark">Not ${bin.wrong}</div><div class="fb-body">Think again about this one: <b>${it.name}</b>. ${bin.ask}</div>`;
     }
   });
 }
@@ -820,7 +829,7 @@ function startS1() {
       $$('.opt', box).forEach(b => b.onclick = () => {
         const key = item.src ? '1' : '0', ok = b.dataset.v === key;
         markOpts(box, key, b, 'v');
-        done(ok, `<b>${item.name}</b> ${item.src ? 'is' : 'is not'} a light source. ${item.why}`);
+        done(ok, `<b>${item.name}</b> ${item.plural ? 'are' : 'is'} ${item.src ? '' : 'not '}${item.plural ? 'light sources' : 'a light source'}. ${item.why}`);
       });
     }
   }));
@@ -927,6 +936,7 @@ function sunGeom(t) {
 function describeSun(t) {
   const g = sunGeom(t);
   if (g.L < 8) return 'Shadow: very short, almost under the pole.';
+  if (g.L >= 330) return `Shadow: very long (more than 7 m), pointing ${g.dir < 0 ? 'west' : 'east'}.`;
   return `Shadow: about ${(g.L * 2 / SUN.PH).toFixed(1)} m long, pointing ${g.dir < 0 ? 'west' : 'east'}.`;
 }
 function drawSun(ctx, t) {
@@ -961,7 +971,7 @@ function theatreTask(spec) {
         <canvas id="shCv" role="img" aria-label="Shadow theatre. Left: side view of a torch, a puppet and a screen. Right: the shadow on the screen, with a dashed target outline."></canvas>
         <p class="legend">Left: side view (torch → puppet → screen). Right: what you see on the screen. Dashed line = target.</p>
         <div class="controls">
-          <div class="ctrl"><label for="distIn">Puppet distance from torch: <span class="mono" id="distVal"></span></label><input id="distIn" type="range" min="100" max="400" value="${d0}"></div>
+          <div class="ctrl"><label for="distIn">Puppet distance from torch: <span class="mono" id="distVal"></span></label><input id="distIn" type="range" min="100" max="400" step="5" value="${d0}"></div>
           <div class="seg" id="matSeg" role="group" aria-label="Puppet material">${Object.keys(MAT).map(m => `<button data-m="${m}" style="--c:var(--${m})" aria-pressed="${m === 'opaque'}">${MAT[m].label}</button>`).join('')}</div>
         </div>
         <p class="readout">Shadow height: <span class="mono" id="sizeVal"></span> · Target: <span class="mono">${(spec.target / 10).toFixed(1)} cm</span></p>
@@ -1002,7 +1012,7 @@ function theatreTask(spec) {
       };
       $('#skipBtn', box).onclick = () => {
         s.mat = spec.mat; $$('#matSeg button', box).forEach(x => x.setAttribute('aria-pressed', x.dataset.m === spec.mat));
-        dIn.value = Math.round(distFor(spec.target)); upd();
+        dIn.value = Math.round(distFor(spec.target) / 5) * 5; upd();
         end(false, 'Here is one way to do it', false);
       };
     }
@@ -1013,7 +1023,7 @@ const SUN_GOALS = {
   shortest: { prompt: 'Drag the time so the flagpole’s shadow is as <b>short</b> as it can be.', check: t => Math.abs(t - 12) <= 0.5, hint: 'Shadows are shortest when the Sun is highest in the sky.', answer: 12, explain: 'Around noon the Sun is highest in the sky, so the shadow is shortest.' },
   west: { prompt: 'Drag the time so the shadow points to the <b>west</b>.', check: t => { const g = sunGeom(t); return g.dir < 0 && g.L >= 10; }, hint: 'A shadow forms on the side away from the Sun. Where must the Sun be?', answer: 8.5, explain: 'In the morning the Sun is in the east, so the shadow points west.' },
   east: { prompt: 'Drag the time so the shadow points to the <b>east</b>.', check: t => { const g = sunGeom(t); return g.dir > 0 && g.L >= 10; }, hint: 'A shadow forms on the side away from the Sun. Where must the Sun be?', answer: 16, explain: 'In the afternoon the Sun is in the west, so the shadow points east.' },
-  longPM: { prompt: 'Drag the time to make a <b>long</b> shadow in the <b>evening</b>.', check: t => t >= 17, hint: 'Shadows are long when the Sun is low in the sky.', answer: 17.5, explain: 'In the evening the Sun is low in the west, so the shadow is long and points east.' },
+  longPM: { prompt: 'Drag the time to make a <b>long</b> shadow in the <b>evening</b>.', check: t => t >= 17, hint: 'Evening is close to sunset. Move the time later, nearer 6 pm, so the Sun is low in the west.', answer: 17.5, explain: 'In the evening the Sun is low in the west, so the shadow is long and points east.' },
 };
 function sunTask(goal) {
   const G = SUN_GOALS[goal];
@@ -1021,7 +1031,7 @@ function sunTask(goal) {
     render(box, done) {
       box.innerHTML = `<p class="prompt">${G.prompt}</p>
         <canvas id="sunCv" role="img" aria-label="A 2-metre flagpole on the ground. The Sun moves from the east (right) to the west (left) as the time changes."></canvas>
-        <div class="controls"><div class="ctrl"><label for="timeIn">Time of day: <span class="mono" id="timeVal"></span></label><input id="timeIn" type="range" min="6" max="18" step="0.25" value="${goal === 'shortest' ? 8 : 12}"></div></div>
+        <div class="controls"><div class="ctrl"><label for="timeIn">Time of day: <span class="mono" id="timeVal"></span></label><input id="timeIn" type="range" min="6.5" max="17.5" step="0.25" value="${goal === 'shortest' ? 8 : 12}"></div></div>
         <p class="readout" id="sunRead" aria-live="polite"></p>
         <p class="tip" id="sunTip" aria-live="polite">The Sun rises in the east and sets in the west.</p>
         <div class="controls"><button class="btn sun" id="checkBtn">Check</button><button class="btn ghost" id="skipBtn" hidden>Show me the answer</button></div>`;
@@ -1032,7 +1042,7 @@ function sunTask(goal) {
       tIn.oninput = upd; upd();
       autoRedraw(cv, draw);
       const end = (ok, mark, solved) => {
-        tIn.disabled = true; $('#checkBtn', box).disabled = true; $('#skipBtn', box).hidden = true;
+        tIn.disabled = true; $('#checkBtn', box).disabled = true; $('#skipBtn', box).hidden = true; $('#sunTip', box).hidden = true;
         done(ok, G.explain + ' A shadow always forms on the side away from the light.' + (!ok && solved ? ' Only first tries earn stars.' : ''), mark, solved);
       };
       $('#checkBtn', box).onclick = () => {
@@ -1066,9 +1076,9 @@ function startS4() {
   view.innerHTML = `${head(st, 'Some materials let heat travel through them quickly. Watch the race, then sort the materials into the right boxes.')}
     <section class="lab-block">
       <h3>The spoon race</h3>
-      <p>Three spoons of the <b>same size and shape</b> stand in the same beaker of hot water. A bead is stuck at the <b>same height</b> on each spoon with the <b>same amount of wax</b>. When enough heat travels up a spoon to melt the wax, its bead drops.</p>
+      <p>Three spoons of the <b>same size and shape</b> stand in the same empty beaker. A bead is stuck at the <b>same height</b> on each spoon with the <b>same amount of wax</b>. When you pour in hot water, heat travels up each spoon. When enough heat reaches the wax, it melts and the bead drops.</p>
       <p class="howto">Predict first: which bead will drop first?</p>
-      <div class="seg" id="predSeg" role="group" aria-label="Your prediction">${['Metal', 'Plastic', 'Wood'].map(m => `<button data-p="${m}" aria-pressed="false">${m} spoon</button>`).join('')}</div>
+      <div class="seg" id="predSeg" role="group" aria-label="Your prediction">${['Metal', 'Plastic', 'Wooden'].map(m => `<button data-p="${m}" aria-pressed="false">${m} spoon</button>`).join('')}</div>
       <canvas id="raceCv" role="img" aria-label="Metal, plastic and wooden spoons standing in a beaker, each with a bead stuck near the top with wax" style="margin-top:12px"></canvas>
       <p class="legend">Left to right: <b>metal</b>, <b>plastic</b> and <b>wooden</b> spoon. Red shows heat travelling up each spoon.</p>
       <div class="controls"><button class="btn sun" id="raceBtn" disabled>Pour in the hot water</button><span class="mono" id="raceTime" aria-live="off">0 min 00 s</span></div>
@@ -1095,11 +1105,13 @@ function startS4() {
     { name: 'Wood', tone: '--wood', T: 34 },
   ];
   const RUN = 9; // seconds of animation = 3 minutes of experiment
-  let t0 = null, pick = null, lastSecs = -1;
+  let t0 = null, pick = null, lastSecs = -1, resultShown = false;
+  // The prediction is locked once the water is poured, so it cannot be changed after seeing the result.
   $$('#predSeg button').forEach(b => b.onclick = () => {
+    if (t0 !== null) return;
     pick = b.dataset.p; $$('#predSeg button').forEach(x => x.setAttribute('aria-pressed', x === b));
-    btn.disabled = t0 !== null && performance.now() - t0 < RUN * 1000 && !reduced;
-    if (t0 === null) cap.textContent = `You predicted the ${pick.toLowerCase()} spoon. Now pour in the hot water.`;
+    btn.disabled = false;
+    cap.textContent = `You predicted the ${pick.toLowerCase()} spoon. Now pour in the hot water.`;
   });
   function draw(now) {
     if (!cv.isConnected) return false;
@@ -1138,15 +1150,19 @@ function startS4() {
     if (secs !== lastSecs) { lastSecs = secs; $('#raceTime').textContent = `${Math.floor(secs / 60)} min ${String(secs % 60).padStart(2, '0')} s`; }
     if (t0 === null) return false;
     if (t >= RUN) {
+      if (resultShown) return false;
+      resultShown = true;
       cap.innerHTML = `${pick ? `You predicted the ${pick.toLowerCase()} spoon. ${pick === 'Metal' ? '<b>You were right!</b> ' : '<b>Look again:</b> '}` : ''}<b>Result after 3 minutes:</b> only the bead on the <b>metal</b> spoon has dropped. Heat travelled up the metal spoon quickly, so the wax melted. Metal is a <b>good conductor of heat</b>. Plastic and wood are <b>poor conductors</b>: heat travels through them slowly, so their wax has not melted yet.`;
       btn.disabled = false; btn.textContent = 'Run it again';
+      if (document.activeElement === document.body || document.activeElement === btn) btn.focus({ preventScroll: true });
       return false;
     }
   }
   draw(performance.now());
   autoRedraw(cv, () => { if (!anim) draw(performance.now()); });
   btn.onclick = () => {
-    t0 = performance.now(); btn.disabled = true; lastSecs = -1;
+    t0 = performance.now(); btn.disabled = true; lastSecs = -1; resultShown = false;
+    $$('#predSeg button').forEach(x => x.disabled = true);
     cap.textContent = 'Watch the heat travel up each spoon…';
     loop(draw);
   };
@@ -1161,7 +1177,7 @@ function thermometer(temp) {
     ticks += `<line x1="66" x2="${major ? 82 : 74}" y1="${y(v)}" y2="${y(v)}" class="tick${major ? ' major' : ''}"/>`;
     if (major) ticks += `<text x="46" y="${y(v) + 3.5}" class="tlab">${v}</text>`;
   }
-  return `<svg class="thermo" viewBox="0 0 120 330" role="img" aria-label="Thermometer marked from 0 to 100 °C">
+  return `<svg class="thermo" viewBox="0 0 120 330" role="img" aria-label="Thermometer marked from 0 to 100 °C">
     <rect x="52" y="${y(temp)}" width="14" height="${300 - y(temp)}" class="d-hot"/>
     <circle cx="59" cy="300" r="16" class="d-hot"/>
     ${ticks}
@@ -1175,8 +1191,8 @@ function thermoQ() {
   return numeric({
     figure: thermometer(t), unit: '°C', answer: t,
     prompt: 'What temperature does this thermometer show?',
-    tip: 'Each small mark stands for 2 °C. Read the mark level with the top of the red liquid.',
-    explain: `Find the labelled mark just below the top of the liquid, then count up in 2s: <b>${t} °C</b>.`,
+    tip: 'Each small mark stands for 2 °C. Read the mark level with the top of the red liquid.',
+    explain: `Find the labelled mark just below the top of the liquid, then count up in 2s: <b>${t} °C</b>.`,
   });
 }
 function flowQ(sc) {
@@ -1185,7 +1201,7 @@ function flowQ(sc) {
       const tf = sc.room ? sc.tb : sc.ta === sc.tb ? sc.ta : Math.round((sc.ca * sc.ta + sc.cb * sc.tb) / (sc.ca + sc.cb));
       const key = sc.ta > sc.tb ? 'AB' : sc.ta < sc.tb ? 'BA' : 'none';
       const roleA = key === 'AB' ? 'hot' : key === 'BA' ? 'cold' : 'muted', roleB = key === 'AB' ? 'cold' : key === 'BA' ? 'hot' : 'muted';
-      const card = (id, n, ic, t) => `<div class="obj"><span class="obj-icon" aria-hidden="true">${ic}</span><span class="obj-name">${id} · ${n}</span><div class="mini" aria-hidden="true"><i id="bar${id}"></i></div><span class="mono obj-t" id="t${id}">${t} °C</span></div>`;
+      const card = (id, n, ic, t) => `<div class="obj"><span class="obj-icon" aria-hidden="true">${ic}</span><span class="obj-name">${id} · ${n}</span><div class="mini" aria-hidden="true"><i id="bar${id}"></i></div><span class="mono obj-t" id="t${id}">${t} °C</span></div>`;
       box.innerHTML = `<p class="prompt">${sc.q} Which way does heat flow?</p>
         <div class="flow">${card('A', sc.a, sc.ia, sc.ta)}<div class="flow-mid"><svg id="arw" viewBox="0 0 80 40" hidden aria-hidden="true"><path d="M5 20 H70 M56 7 L72 20 L56 33" class="arrow-path"/></svg></div>${card('B', sc.b, sc.ib, sc.tb)}</div>
         <div class="opts">
@@ -1194,7 +1210,7 @@ function flowQ(sc) {
           <button class="opt" data-k="none"><span class="opt-key">3</span><span>No heat flows between them</span></button>
         </div>`;
       const paint = (id, T, role) => {
-        $('#t' + id, box).textContent = Math.round(T) + ' °C';
+        $('#t' + id, box).textContent = Math.round(T) + ' °C';
         const bar = $('#bar' + id, box); bar.style.height = Math.max(4, T) + '%'; bar.style.background = `var(--${role})`;
       };
       paint('A', sc.ta, roleA); paint('B', sc.tb, roleB);
@@ -1213,12 +1229,12 @@ function flowQ(sc) {
         }
         const [hot, hT, cold, cT] = sc.ta > sc.tb ? [sc.a, sc.ta, sc.b, sc.tb] : [sc.b, sc.tb, sc.a, sc.ta];
         let ex;
-        if (key === 'none') ex = `Both are at the same temperature (${sc.ta} °C), so there is no heat flow between them.`;
+        if (key === 'none') ex = `Both are at the same temperature (${sc.ta} °C), so there is no heat flow between them.`;
         else if (sc.room) {
           const obj = sc.a.toLowerCase();
-          ex = `Heat flows from the ${hot.toLowerCase()} (${hT} °C) to the ${cold.toLowerCase()} (${cT} °C), because heat flows from hotter to colder. The ${obj} ${key === 'AB' ? 'loses heat and its temperature falls' : 'gains heat and its temperature rises'} until it reaches room temperature (${sc.tb} °C). There is so much air in the room that its temperature hardly changes.`;
+          ex = `Heat flows from the ${hot.toLowerCase()} (${hT} °C) to the ${cold.toLowerCase()} (${cT} °C), because heat flows from hotter to colder. The ${obj} ${key === 'AB' ? 'loses heat and its temperature falls' : 'gains heat and its temperature rises'} until it reaches room temperature (${sc.tb} °C). There is so much air in the room that its temperature hardly changes.`;
         } else {
-          ex = `Heat flows from the ${hot.toLowerCase()} (${hT} °C) to the ${cold.toLowerCase()} (${cT} °C), because heat flows from hotter to colder. The ${hot.toLowerCase()} loses heat and its temperature falls. The ${cold.toLowerCase()} gains heat and its temperature rises. They stop changing when both reach the same temperature (about ${tf} °C).`;
+          ex = `Heat flows from the ${hot.toLowerCase()} (${hT} °C) to the ${cold.toLowerCase()} (${cT} °C), because heat flows from hotter to colder. The ${hot.toLowerCase()} loses heat and its temperature falls. The ${cold.toLowerCase()} gains heat and its temperature rises. Heat stops flowing between them when both reach the same temperature (about ${tf} °C).`;
         }
         done(ok, ex);
       });
@@ -1228,7 +1244,7 @@ function flowQ(sc) {
 function startS5() {
   const st = STATIONS[4];
   const base = shuffle(FLOW_SCENES);
-  const scenes = [base[0], base[1], Math.random() < 0.4 ? SAME_SCENE : base[2]];
+  const scenes = shuffle([base[0], base[1], Math.random() < 0.4 ? SAME_SCENE : base[2]]);
   const mcqs = shuffle(HEAT_MCQ).slice(0, 3);
   const qs = [thermoQ(), flowQ(scenes[0]), mcq(mcqs[0]), thermoQ(), flowQ(scenes[1]), mcq(mcqs[1]), thermoQ(), flowQ(scenes[2]), mcq(mcqs[2])];
   runQuiz(st, 'Temperature tells us how hot or cold something is. Heat flows from a hotter object to a colder one.', qs);
@@ -1282,7 +1298,7 @@ function renderNotes() {
           <li>Moving the object <b>closer to the light</b> makes the shadow <b>bigger</b>. Moving it away makes the shadow smaller.</li>
           <li>Moving the <b>light closer</b> to the object, or the <b>screen further away</b> from it, also makes the shadow <b>bigger</b>.</li>
           <li>The shadow's shape depends on the object's shape and which side faces the light.</li>
-          <li>A shadow forms on the side <b>away from the light</b>. A shadow is dark, whatever colour the object is.</li>
+          <li>A shadow forms on the side <b>away from the light</b>. The shadow of an <b>opaque</b> object is dark, whatever colour the object is.</li>
           <li>Sun shadows are <b>long</b> in the morning and evening (Sun low) and <b>shortest around noon</b> (Sun high). Morning shadows point west; afternoon shadows point east.</li>
         </ul>
       </section>
